@@ -1,11 +1,9 @@
 
 [![CI](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml)
-[![codecov](https://codecov.io/gl/cardboardcode/virtual_camera/branch/%5Cx6d6173746572/graph/badge.svg?token=PUMOP6DIK0)](https://codecov.io/gl/cardboardcode/virtual_camera)
-
 
 ## What Is This?
 
-A ROS2 package that simulates a camera, providing ROS messages from playing a static video.
+A ROS2 package that **simulates a camera, providing ROS messages from playing a static video.
 
 ## Dependencies
 
