@@ -8,8 +8,12 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 
 ## **Dependencies**
 
-1. OpenCV
-2. ROS2 Foxy
+1. [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
+2. ROS2 [Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html)
+
+## **Tested on**
+
+Ubuntu 20.04.2
 
 ## **Setup**
 
