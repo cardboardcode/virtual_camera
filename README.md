@@ -2,16 +2,16 @@
 [![CI](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## What Is This?
+## **What Is This**?
 
 A ROS2 package that **simulates a camera**, providing ROS messages from **playing a static video**.
 
-## Dependencies
+## **Dependencies**
 
 1. OpenCV
 2. ROS2 Foxy
 
-## Setup
+## **Setup**
 
 Run the command below.
 
@@ -26,7 +26,7 @@ ros2 run virtual_camera virtual_camera
 ./scripts/show_image.bash
 ```
 
-## Control FPS
+### **Control FPS**
 Run the following command to control the speed of the video
 
 ```bash
@@ -35,8 +35,9 @@ ros2 param set /virtual_camera FPS <an integer>
 
 ```
 
-## Docker Instructions
+### **Docker Instructions**
 
+This section is for users who do not want to worry about installing all dependencies stated above.
 
 1. Build the docker image.
 
