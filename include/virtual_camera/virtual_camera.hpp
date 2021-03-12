@@ -76,9 +76,6 @@ public:
     // Set publisher to publish message at set time interval.
     timer_ = this->create_wall_timer(
       std::chrono::milliseconds(1000 / fps), std::bind(&VirtualCamera::timer_callback, this));
-    // Create subscriber
-    sub_ = this->create_subscription<std_msgs::msg::String>("/virtual_camera/state_input",
-        10, std::bind(&VirtualCamera::state_callback, this, std::placeholders::_1));
 
     std::string temp(PATH_TO_PACKAGE);
 
@@ -98,21 +95,17 @@ public:
     this->set_parameter(rclcpp::Parameter("FPS", 24));
   }
 
-private:
-  /*! \brief
-   * Acts as an active callback function to receive remote calls to shutdown.
-   */
-  void state_callback(const std_msgs::msg::String::SharedPtr msg) const
+  void activate_time_callback(void)
   {
-    std::string requested_state = msg->data.c_str();
-
-    if (requested_state.compare("shutdown") == 0) {
-      shuttingDown = true;
-      rclcpp::shutdown();
-    } else {
-      RCLCPP_WARN(this->get_logger(), "Invalid state requested.");
-    }
+    this->timer_callback();
   }
+
+  void activate_advance_cursor(void)
+  {
+    this->advance_cursor();
+  }
+
+private:
   /*! \brief
    * Acts as an active publisher of images taken by VideoCapture and outputs
    * as ROS2 sensor_msgs Image messages.\n
