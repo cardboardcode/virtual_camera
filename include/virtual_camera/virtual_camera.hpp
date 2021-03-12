@@ -26,7 +26,7 @@
 // OpenCV library
 #include "opencv2/opencv.hpp"
 
-#define FILE_PATH_TO_VIDEO "/data/random_video"
+#define FILE_PATH_TO_VIDEO "/data/input_data"
 // #define FPS 24
 
 /*! \class VirtualCamera
@@ -155,7 +155,7 @@ private:
 
     if (frame.empty()) {
       RCLCPP_WARN(this->get_logger(),
-        "Discarding faulty image. [random_video] symlink broken.");
+        "Discarding faulty image. [input_data] symlink broken.");
       return;
     }
     // Implement progress wheel here.

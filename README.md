@@ -38,9 +38,9 @@ ros2 run virtual_camera virtual_camera
 mkdir data && cd data
 # Move your intended video/image into this folder
 # Create a symbolic link to video.
-ln -sf <video_file_name> random_video
+ln -sf <video_file_name> input_data
 # Or create a symbolic link to image.
-ln -sf <image_file_name> random_video
+ln -sf <image_file_name> input_data
 ```
 
 #### **Control FPS**
