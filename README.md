@@ -34,8 +34,8 @@ ros2 run virtual_camera virtual_camera
 #### **Create A Static Video/Image**
 
 ```bash
-# Create a new folder called data
-mkdir data && cd data
+# Jump into a folder called data
+cd data
 # Move your intended video/image into this folder
 # Create a symbolic link to video.
 ln -sf <video_file_name> input_data
