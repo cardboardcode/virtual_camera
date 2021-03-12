@@ -1,0 +1,11 @@
+# Ignore types of files and or folders
+build/*
+install/*
+log/*
+*.png
+*.jpeg
+*.jpg
+
+# Ignore specific file
+data/random_video
+AMENT_IGNORE
