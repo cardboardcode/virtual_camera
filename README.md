@@ -5,7 +5,7 @@
 
 ## **What Is This**?
 
-A ROS2 package that **simulates a camera**, providing ROS messages from **playing a static video**.
+A ROS2 package that **simulates a camera**, providing ROS messages from **playing a static video or image**.
 
 ## **Dependencies**
 
@@ -31,7 +31,19 @@ ros2 run virtual_camera virtual_camera
 ./scripts/show_image.bash
 ```
 
-### **Control FPS**
+#### **Create A Static Video/Image**
+
+```bash
+# Create a new folder called data
+mkdir data && cd data
+# Move your intended video/image into this folder
+# Create a symbolic link to video.
+ln -sf <video_file_name> random_video
+# Or create a symbolic link to image.
+ln -sf <image_file_name> random_video
+```
+
+#### **Control FPS**
 Run the following command to control the speed of the video
 
 ```bash
@@ -40,17 +52,17 @@ ros2 param set /virtual_camera FPS <an integer>
 
 ```
 
-### **Docker Instructions**
+#### **Docker Instructions**
 
 This section is for users who do not want to worry about installing all dependencies stated above.
 
-1. Build the docker image.
+Build the docker image.
 
 ```bash
 docker build --tag vcam_image .
 ```
 
-2. Run the docker image.
+Run the docker image.
 
 ```bash
 # For first run.
