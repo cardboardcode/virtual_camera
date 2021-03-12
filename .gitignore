@@ -4,7 +4,6 @@ install/*
 log/*
 *.png
 *.jpeg
-*.jpg
 
 # Ignore specific file
 data/random_video
