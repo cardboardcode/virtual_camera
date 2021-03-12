@@ -1,5 +1,5 @@
 
-
+[![CI](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml)
 [![codecov](https://codecov.io/gl/cardboardcode/virtual_camera/branch/%5Cx6d6173746572/graph/badge.svg?token=PUMOP6DIK0)](https://codecov.io/gl/cardboardcode/virtual_camera)
 
 
