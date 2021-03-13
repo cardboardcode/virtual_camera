@@ -18,7 +18,7 @@ Ubuntu 20.04.2
 
 ## **Setup**
 
-Run the command below.
+**Run** the command below.
 
 ```bash
 ros2 run virtual_camera virtual_camera
@@ -56,13 +56,13 @@ ros2 param set /virtual_camera FPS <an integer>
 
 This section is for users who do not want to worry about installing all dependencies stated above.
 
-Build the docker image.
+**Build** the docker image.
 
 ```bash
 docker build --tag vcam_image .
 ```
 
-Run the docker image.
+**Run** the docker image.
 
 ```bash
 # For first run.
