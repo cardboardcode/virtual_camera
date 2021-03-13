@@ -38,8 +38,6 @@ public:
   /*! \brief A Constructor function*/
   ImageViewer();
 
-  bool isTesting = false;
-
   void activate_image_callback(sensor_msgs::msg::Image::SharedPtr msg);
 
 private:
@@ -58,11 +56,9 @@ private:
 ImageViewer::ImageViewer()
 : Node("image_viewer")
 {
-  if (!isTesting) {
-    cv::namedWindow("image_viewer", cv::WINDOW_AUTOSIZE);
-    cv::moveWindow("image_viewer", 0, 375);
-    cv::waitKey(1);
-  }
+  cv::namedWindow("image_viewer", cv::WINDOW_AUTOSIZE);
+  cv::moveWindow("image_viewer", 0, 375);
+  cv::waitKey(1);
 
   size_t depth_ = rmw_qos_profile_default.depth;
   rmw_qos_history_policy_t history_policy_ = rmw_qos_profile_default.history;
@@ -115,10 +111,8 @@ void ImageViewer::image_callback(const sensor_msgs::msg::Image::SharedPtr msg) c
 
   cv::Mat cvframe = frame;
 
-  if (!isTesting) {
-    cv::imshow("image_viewer", cvframe);
-    cv::waitKey(1);
-  }
+  cv::imshow("image_viewer", cvframe);
+  cv::waitKey(1);
 }
 
 #endif  // VIRTUAL_CAMERA__IMAGE_VIEWER_HPP_

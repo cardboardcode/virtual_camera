@@ -39,8 +39,6 @@ TEST(ImageViewer_TestSuite, Test_ImageViewer_)
 
   auto imageviewer_node = std::make_shared<ImageViewer>();
 
-  imageviewer_node->isTesting = true;
-
   cv::Mat frame = cv::imread(PATH_TO_TEST_IMAGE, cv::IMREAD_COLOR);
 
   sensor_msgs::msg::Image::SharedPtr input_msg =
