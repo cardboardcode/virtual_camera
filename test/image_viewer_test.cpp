@@ -38,6 +38,9 @@ TEST(ImageViewer_TestSuite, Test_ImageViewer_)
   system(("ln -sf " + PATH_TO_TEST_IMAGE + " input_data").c_str());
 
   auto imageviewer_node = std::make_shared<ImageViewer>();
+
+  imageviewer_node->isTesting = true;
+
   cv::Mat frame = cv::imread(PATH_TO_TEST_IMAGE, cv::IMREAD_COLOR);
 
   sensor_msgs::msg::Image::SharedPtr input_msg =
