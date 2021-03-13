@@ -24,10 +24,10 @@ def generate_launch_description():
             output='screen',
             ),
         launch_ros.actions.Node(
-            package='image_tools',
-            executable='showimage',
+            package='virtual_camera',
+            executable='image_viewer',
             output='log',
-            remappings=[('/image', '/virtual_camera/image_raw')]
+            remappings=[('/image_viewer/image_input', '/virtual_camera/image_raw')]
             ),
 
     ])

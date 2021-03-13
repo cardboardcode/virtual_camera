@@ -45,8 +45,13 @@ add_definitions(-DPATH_TO_PACKAGE="${CMAKE_CURRENT_LIST_DIR}")
 add_executable(virtual_camera src/virtual_camera.cpp)
 ament_target_dependencies(virtual_camera rclcpp std_msgs sensor_msgs OpenCV cv_bridge ament_index_cpp)
 
+add_executable(image_viewer src/image_viewer.cpp)
+ament_target_dependencies(image_viewer rclcpp std_msgs sensor_msgs OpenCV cv_bridge)
+
+
 install(TARGETS
   virtual_camera
+  image_viewer
   DESTINATION lib/${PROJECT_NAME}
 )
 
