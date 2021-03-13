@@ -49,7 +49,6 @@ private:
   int encoding2mat_type(const std::string & encoding) const;
   /*! \brief A ROS2 callback function utilized by sub_1.*/
   void image_callback(const sensor_msgs::msg::Image::SharedPtr msg) const;
-
 };
 
 ImageViewer::ImageViewer()
@@ -67,9 +66,9 @@ ImageViewer::ImageViewer()
     rclcpp::QoSInitialization(history_policy_, depth_));
   qos.reliability(reliability_policy_);
 
-  sub_1_ = this->create_subscription<sensor_msgs::msg::Image>("/image_viewer/image_input",
-      qos, std::bind(&ImageViewer::image_callback, this, std::placeholders::_1));
-
+  sub_1_ = this->create_subscription<sensor_msgs::msg::Image>(
+    "/image_viewer/image_input",
+    qos, std::bind(&ImageViewer::image_callback, this, std::placeholders::_1));
 }
 
 int ImageViewer::encoding2mat_type(const std::string & encoding) const

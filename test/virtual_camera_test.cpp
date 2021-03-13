@@ -16,9 +16,8 @@
 #include <bits/stdc++.h>
 #include <chrono>
 #include <string>
-#include <functional>
 #include <memory>
-#include <string>
+#include <functional>
 
 #include "cv_bridge/cv_bridge.h"
 #include "rclcpp/rclcpp.hpp"

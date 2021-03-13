@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef VIRTUAL_CAMERA__VIRTUAL_CAMERA_HPP_
+#define VIRTUAL_CAMERA__VIRTUAL_CAMERA_HPP_
+
 #include <chrono>
 #include <string>
 #include <functional>
 #include <memory>
-#include <string>
 
 #include "cv_bridge/cv_bridge.h"
 #include "rclcpp/rclcpp.hpp"
@@ -122,7 +124,7 @@ private:
     rclcpp::Parameter int_param = this->get_parameter("FPS");
     int new_fps = int_param.as_int();
 
-    if (fps != new_fps){
+    if (fps != new_fps) {
       // ros2 param set /virtual_camera FPS 100
       RCLCPP_WARN(this->get_logger(), "Changing FPS to %d.", new_fps);
       fps = new_fps;
@@ -147,7 +149,8 @@ private:
     }
 
     if (frame.empty()) {
-      RCLCPP_WARN(this->get_logger(),
+      RCLCPP_WARN(
+        this->get_logger(),
         "Discarding faulty image. [input_data] symlink broken.");
       return;
     }
@@ -172,3 +175,5 @@ private:
     pos = (pos + 1) % 4;
   }
 };
+
+#endif  // VIRTUAL_CAMERA__VIRTUAL_CAMERA_HPP_
