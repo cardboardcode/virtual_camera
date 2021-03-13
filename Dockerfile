@@ -1,4 +1,4 @@
-FROM ros:foxy-ros-base-focal
+FROM ros:eloquent-ros-base-focal
 
 MAINTAINER Bey Hao Yun <beyhy@artc.a-star.edu.sg>
 
@@ -8,7 +8,7 @@ RUN adduser --quiet --disabled-password guiuser
 # Install OpenCV
 RUN apt-get update && \
     apt-get install -y libopencv-dev && \
-    apt-get install -y ros-foxy-cv-bridge && \
+    apt-get install -y ros-eloquent-cv-bridge && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/guiuser/
@@ -16,7 +16,7 @@ WORKDIR /home/guiuser/
 # Get ROS2 package image_tools available for sourcing.
 USER guiuser
 RUN git clone https://github.com/ros2/demos.git \
-    --branch foxy \
+    --branch eloquent \
     --single-branch \
     --depth 1
 

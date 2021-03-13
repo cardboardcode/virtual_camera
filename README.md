@@ -10,11 +10,11 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 ## **Dependencies**
 
 1. [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
-2. ROS2 [Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html)
+2. ROS2 [Eloquent Elusor](https://docs.ros.org/en/eloquent/Installation.html)
 
 ## **Tested on**
 
-Ubuntu 20.04.2
+Ubuntu 18.04.1
 
 ## **Setup**
 

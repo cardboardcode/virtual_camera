@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /opt/ros/foxy/setup.bash
+source /opt/ros/eloquent/setup.bash
 
 echo "Please input the FPS integer (1-200)"
 read input

@@ -1,6 +1,4 @@
 #!/bin/bash
 
-source /opt/ros/foxy/setup.bash
+source /opt/ros/eloquent/setup.bash
 colcon build
-
-

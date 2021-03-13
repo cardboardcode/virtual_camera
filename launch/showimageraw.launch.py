@@ -20,12 +20,12 @@ def generate_launch_description():
     return LaunchDescription([
         launch_ros.actions.Node(
             package='virtual_camera',
-            executable='virtual_camera',
+            node_executable='virtual_camera',
             output='screen',
             ),
         launch_ros.actions.Node(
             package='virtual_camera',
-            executable='image_viewer',
+            node_executable='image_viewer',
             output='log',
             remappings=[('/image_viewer/image_input', '/virtual_camera/image_raw')]
             ),
