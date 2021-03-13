@@ -38,6 +38,8 @@ public:
   /*! \brief A Constructor function*/
   ImageViewer();
 
+  void activate_image_callback(sensor_msgs::msg::Image::SharedPtr msg);
+
 private:
   /*! \brief A subscriber member variable to receive images to receive.*/
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_1_;
@@ -90,6 +92,11 @@ int ImageViewer::encoding2mat_type(const std::string & encoding) const
   } else {
     throw std::runtime_error("Unsupported encoding type");
   }
+}
+
+void ImageViewer::activate_image_callback(sensor_msgs::msg::Image::SharedPtr msg)
+{
+  this->image_callback(msg);
 }
 
 void ImageViewer::image_callback(const sensor_msgs::msg::Image::SharedPtr msg) const

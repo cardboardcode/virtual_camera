@@ -34,10 +34,13 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest REQUIRED)
-  # find_package(ament_cmake_pytest REQUIRED)
-  ament_add_gtest(virtual_camera_test_cpp test/virtual_camera_test.cpp)
 
+  ament_add_gtest(image_viewer_test_cpp test/image_viewer_test.cpp)
+  ament_target_dependencies(image_viewer_test_cpp rclcpp std_msgs sensor_msgs OpenCV cv_bridge)
+
+  ament_add_gtest(virtual_camera_test_cpp test/virtual_camera_test.cpp)
   ament_target_dependencies(virtual_camera_test_cpp rclcpp std_msgs sensor_msgs OpenCV cv_bridge)
+
 endif()
 
 add_definitions(-DPATH_TO_PACKAGE="${CMAKE_CURRENT_LIST_DIR}")
