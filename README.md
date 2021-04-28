@@ -54,7 +54,7 @@ ros2 param set /virtual_camera FPS <an integer>
 
 #### **Docker Instructions**
 
-This section is for users who do not want to worry about installing all dependencies stated above.
+This section is for **users who do not want to worry about installing all dependencies stated above**.
 
 **Build** the docker image.
 
