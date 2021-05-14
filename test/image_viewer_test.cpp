@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <bits/stdc++.h>
 #include <chrono>
 #include <string>
 #include <memory>
