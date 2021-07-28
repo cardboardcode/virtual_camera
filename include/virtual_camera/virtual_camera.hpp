@@ -120,6 +120,16 @@ private:
    */
   void timer_callback()
   {
+    sensor_msgs::msg::Image msg;
+
+    msg = this->process_timer_callback();
+
+    publisher_->publish(msg);
+    advance_cursor();
+  }
+
+  sensor_msgs::msg::Image process_timer_callback()
+  {
     // RCLCPP_INFO(this->get_logger(), "Publishing Image");
     rclcpp::Parameter int_param = this->get_parameter("FPS");
     int new_fps = int_param.as_int();
@@ -152,7 +162,7 @@ private:
       RCLCPP_WARN(
         this->get_logger(),
         "Discarding faulty image. [input_data] symlink broken.");
-      return;
+      throw std::runtime_error("Please check the symbolic link file you are using as input_data.");
     }
     // Implement progress wheel here.
     sensor_msgs::msg::Image::SharedPtr msg = cv_bridge::CvImage(
@@ -160,8 +170,7 @@ private:
 
     msg->header.frame_id = "world";
 
-    publisher_->publish(*msg);
-    advance_cursor();
+    return *msg;
   }
 
   /*! \brief

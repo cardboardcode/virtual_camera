@@ -40,6 +40,9 @@ TEST(VirtualCamera_TestSuite, Test_VirtualCamera_ImageInputData)
   system(("ln -sf " + PATH_TO_TEST_IMAGE + PATH_TO_INPUT_DATA).c_str());
 
   auto vcamera_node = std::make_shared<VirtualCamera>();
+
+  sensor_msgs::msg::Image msg;
+  msg = vcamera_node->process_timer_callback();
 }
 
 // Test with a static video as input_data.
