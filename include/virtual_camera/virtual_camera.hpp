@@ -107,27 +107,6 @@ public:
     this->advance_cursor();
   }
 
-private:
-  /*! \brief
-   * Acts as an active publisher of images taken by VideoCapture and outputs
-   * as ROS2 sensor_msgs Image messages.\n
-   * Checks if VideoCapture reads valid video file.\n
-   * If true, convert and publish cv::Mat object to ROS2 message.
-   * Otherwise, open as Image and publish.\n
-   * Conducts check if final Image or Video file is empty or not.\n
-   * If empty, discard output and generate warning.
-   * Otherwise, publish.
-   */
-  void timer_callback()
-  {
-    sensor_msgs::msg::Image msg;
-
-    msg = this->process_timer_callback();
-
-    publisher_->publish(msg);
-    advance_cursor();
-  }
-
   sensor_msgs::msg::Image process_timer_callback()
   {
     // RCLCPP_INFO(this->get_logger(), "Publishing Image");
@@ -171,6 +150,27 @@ private:
     msg->header.frame_id = "world";
 
     return *msg;
+  }
+
+private:
+  /*! \brief
+   * Acts as an active publisher of images taken by VideoCapture and outputs
+   * as ROS2 sensor_msgs Image messages.\n
+   * Checks if VideoCapture reads valid video file.\n
+   * If true, convert and publish cv::Mat object to ROS2 message.
+   * Otherwise, open as Image and publish.\n
+   * Conducts check if final Image or Video file is empty or not.\n
+   * If empty, discard output and generate warning.
+   * Otherwise, publish.
+   */
+  void timer_callback()
+  {
+    sensor_msgs::msg::Image msg;
+
+    msg = this->process_timer_callback();
+
+    publisher_->publish(msg);
+    advance_cursor();
   }
 
   /*! \brief
