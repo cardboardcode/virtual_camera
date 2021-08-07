@@ -18,7 +18,7 @@ Ubuntu 18.04.1
 
 ## **Setup**
 
-**Run** the command below.:running:
+**Run** the command below.
 
 ```bash
 ros2 run virtual_camera virtual_camera
