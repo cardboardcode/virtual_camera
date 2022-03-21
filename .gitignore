@@ -6,5 +6,5 @@ log/*
 *.jpeg
 
 # Ignore specific file
-data/random_video
+data/input_data
 AMENT_IGNORE

@@ -29,6 +29,7 @@
 #include "opencv2/opencv.hpp"
 
 #define FILE_PATH_TO_VIDEO "/data/input_data"
+#define FILE_PATH_TO_DEFAULT_IMAGE "/data/nadezhda_diskant.jpg"
 // #define FPS 24
 
 /*! \class VirtualCamera
@@ -56,6 +57,7 @@ class VirtualCamera : public rclcpp::Node
   /*!< \brief An array of char which show cursors at different stages. */
   std::string FILE_PATH_TO_PACKAGE;
   int fps = 24;
+  cv::Mat img;
 
 public:
   mutable bool shuttingDown;
@@ -91,6 +93,15 @@ public:
     if (!cap.isOpened()) {
       std::cout << "Error opening video file. Opening as image instead." << std::endl;
       useImage = true;
+    }
+
+    // If reading image, check if image symbolic link file can be accessed properly
+    if (useImage) {
+      img = cv::imread(FILE_PATH_TO_PACKAGE + FILE_PATH_TO_VIDEO, cv::IMREAD_COLOR);
+      // If failed to load image proper, load default image.
+      if (img.empty()) {
+        img = cv::imread(FILE_PATH_TO_PACKAGE + FILE_PATH_TO_DEFAULT_IMAGE, cv::IMREAD_COLOR);
+      }
     }
 
     this->declare_parameter("FPS");
@@ -134,7 +145,7 @@ public:
       }
 
     } else {
-      frame = cv::imread(FILE_PATH_TO_PACKAGE + FILE_PATH_TO_VIDEO, cv::IMREAD_COLOR);
+      frame = img;
     }
 
     if (frame.empty()) {
