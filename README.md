@@ -26,7 +26,7 @@ ros2 run virtual_camera virtual_camera
 
 ```bash
 # For running without image-viewer
-./scripts/run.sh
+./scripts/run.bash
 # For running with image-viewer
 ./scripts/show_image.bash
 ```
