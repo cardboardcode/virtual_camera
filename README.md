@@ -2,6 +2,7 @@
 [![build](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml)
 [![codecov](https://codecov.io/gh/cardboardcode/virtual_camera/branch/main/graph/badge.svg?token=DITZXL86DN)](https://codecov.io/gh/cardboardcode/virtual_camera)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 
 ## **What Is This**?
 
@@ -11,10 +12,6 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 
 1. [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
 2. ROS2 [Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html)
-
-## **Tested on**
-
-Ubuntu 20.04.2
 
 ## **Setup**
 
