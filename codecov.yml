@@ -1,0 +1,2 @@
+ignore:
+  - "virtual_camera/include/virtual_camera/image_viewer.hpp"
