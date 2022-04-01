@@ -35,8 +35,8 @@ if(BUILD_TESTING)
 
   find_package(ament_cmake_gtest REQUIRED)
 
-  # ament_add_gtest(image_viewer_test_cpp test/image_viewer_test.cpp)
-  # ament_target_dependencies(image_viewer_test_cpp rclcpp std_msgs sensor_msgs OpenCV cv_bridge)
+  ament_add_gtest(image_viewer_test_cpp test/image_viewer_test.cpp)
+  ament_target_dependencies(image_viewer_test_cpp rclcpp std_msgs sensor_msgs OpenCV cv_bridge)
 
   ament_add_gtest(virtual_camera_test_cpp test/virtual_camera_test.cpp)
   ament_target_dependencies(virtual_camera_test_cpp rclcpp std_msgs sensor_msgs OpenCV cv_bridge)
