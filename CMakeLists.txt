@@ -23,6 +23,7 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(rcpputils REQUIRED)
 
 include_directories(
   include
@@ -46,7 +47,7 @@ endif()
 add_definitions(-DPATH_TO_PACKAGE="${CMAKE_CURRENT_LIST_DIR}")
 
 add_executable(virtual_camera src/virtual_camera.cpp)
-ament_target_dependencies(virtual_camera rclcpp std_msgs sensor_msgs OpenCV cv_bridge ament_index_cpp)
+ament_target_dependencies(virtual_camera rclcpp std_msgs sensor_msgs OpenCV cv_bridge ament_index_cpp rcpputils)
 
 add_executable(image_viewer src/image_viewer.cpp)
 ament_target_dependencies(image_viewer rclcpp std_msgs sensor_msgs OpenCV cv_bridge)

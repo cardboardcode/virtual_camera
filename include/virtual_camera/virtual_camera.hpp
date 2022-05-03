@@ -24,6 +24,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "rcpputils/filesystem_helper.hpp"
 
 // OpenCV library
 #include "opencv2/opencv.hpp"
@@ -31,6 +32,7 @@
 #define FILE_PATH_TO_VIDEO "/data/input_data"
 #define FILE_PATH_TO_DEFAULT_IMAGE "/data/nadezhda_diskant.jpg"
 // #define FPS 24
+
 
 /*! \class VirtualCamera
     \brief The sole class object in this package.
@@ -81,9 +83,20 @@ public:
     timer_ = this->create_wall_timer(
       std::chrono::milliseconds(1000 / fps), std::bind(&VirtualCamera::timer_callback, this));
 
-    std::string temp(PATH_TO_PACKAGE);
+    FILE_PATH_TO_PACKAGE = PATH_TO_PACKAGE;
 
-    FILE_PATH_TO_PACKAGE = temp;
+    std::string DATA_FOLDER_NAME("/data/");
+    std::string FILE_PATH_TO_DATA_FOLDER(PATH_TO_PACKAGE + DATA_FOLDER_NAME);
+    // const rcpputils::fs::path temp_filepath(FILE_PATH_TO_DATA_FOLDER);
+
+    if (rcpputils::fs::exists(FILE_PATH_TO_DATA_FOLDER)) {
+      RCLCPP_INFO(this->get_logger(), "[ %s ] - FOUND. Proceeding... \n", DATA_FOLDER_NAME.c_str());
+    } else {
+      RCLCPP_INFO(this->get_logger(), "[ %s ] - MISSING. Creating [ %s ] folder... \n",
+        DATA_FOLDER_NAME.c_str(),
+        DATA_FOLDER_NAME.c_str());
+      rcpputils::fs::create_directories(FILE_PATH_TO_DATA_FOLDER);
+    }
 
     printf("%s\n", (FILE_PATH_TO_PACKAGE + FILE_PATH_TO_VIDEO).c_str());
 
@@ -91,15 +104,20 @@ public:
 
     // Check if camera opened successfully
     if (!cap.isOpened()) {
-      std::cout << "Error opening video file. Opening as image instead." << std::endl;
+      RCLCPP_WARN(this->get_logger(), "Error opening video file. Opening as image instead.\n");
       useImage = true;
     }
 
     // If reading image, check if image symbolic link file can be accessed properly
     if (useImage) {
-      img = cv::imread(FILE_PATH_TO_PACKAGE + FILE_PATH_TO_VIDEO, cv::IMREAD_COLOR);
+      img = cv::imread((FILE_PATH_TO_PACKAGE + FILE_PATH_TO_VIDEO).c_str(), cv::IMREAD_COLOR);
+
       // If failed to load image proper, load default image.
       if (img.empty()) {
+        RCLCPP_INFO(
+          this->get_logger(),
+          "[ %s ] - IMAGE EMPTY. Assigning DEFAULT_IMAGE  \n",
+          (FILE_PATH_TO_PACKAGE + FILE_PATH_TO_DEFAULT_IMAGE).c_str());
         img = cv::imread(FILE_PATH_TO_PACKAGE + FILE_PATH_TO_DEFAULT_IMAGE, cv::IMREAD_COLOR);
       }
     }
