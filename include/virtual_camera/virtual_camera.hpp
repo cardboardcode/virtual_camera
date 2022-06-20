@@ -92,7 +92,8 @@ public:
     if (rcpputils::fs::exists(FILE_PATH_TO_DATA_FOLDER)) {
       RCLCPP_INFO(this->get_logger(), "[ %s ] - FOUND. Proceeding... \n", DATA_FOLDER_NAME.c_str());
     } else {
-      RCLCPP_INFO(this->get_logger(), "[ %s ] - MISSING. Creating [ %s ] folder... \n",
+      RCLCPP_INFO(
+        this->get_logger(), "[ %s ] - MISSING. Creating [ %s ] folder... \n",
         DATA_FOLDER_NAME.c_str(),
         DATA_FOLDER_NAME.c_str());
       rcpputils::fs::create_directories(FILE_PATH_TO_DATA_FOLDER);
