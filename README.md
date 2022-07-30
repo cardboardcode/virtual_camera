@@ -18,7 +18,19 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 **Run** the command below.
 
 ```bash
+cd $HOME
+git clone https://github.com/cardboardcode/virtual_camera.git --branch foxy_devel --single-branch --depth 1
+cd ~/virtual_camera
+source /opt/ros/foxy/setup.bash
+colcon build
+```
+
+```bash
+cd ~/virtual_camera
+source install/setup.bash
 ros2 run virtual_camera virtual_camera
+
+ros2 launch virtual_camera showimageraw.launch.py
 ```
 
 ```bash
