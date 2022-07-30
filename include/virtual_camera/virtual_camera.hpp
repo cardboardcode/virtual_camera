@@ -123,8 +123,7 @@ public:
       }
     }
 
-    this->declare_parameter("FPS");
-    this->set_parameter(rclcpp::Parameter("FPS", 24));
+    this->declare_parameter("FPS", 24);
   }
 
   void activate_time_callback(void)
