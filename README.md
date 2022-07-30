@@ -11,7 +11,7 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 ## **Dependencies**
 
 1. [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
-2. ROS2 [Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html)
+2. ROS2 [Galactic Geochelone](https://docs.ros.org/en/galactic/Installation.html)
 
 ## **Setup**
 
@@ -19,9 +19,9 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 
 ```bash
 cd $HOME
-git clone https://github.com/cardboardcode/virtual_camera.git --branch foxy_devel --single-branch --depth 1
+git clone https://github.com/cardboardcode/virtual_camera.git --branch galactic_devel --single-branch --depth 1
 cd ~/virtual_camera
-source /opt/ros/foxy/setup.bash
+source /opt/ros/galactic/setup.bash
 colcon build
 ```
 
