@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /opt/ros/foxy/setup.bash
+source /opt/ros/galactic/setup.bash
 
 echo "Please input the FPS integer (1-200)"
 read input
