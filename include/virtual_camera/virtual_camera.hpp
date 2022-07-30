@@ -197,7 +197,6 @@ private:
     sensor_msgs::msg::Image msg;
 
     msg = this->process_timer_callback();
-    
     publisher_->publish(msg);
     advance_cursor();
   }
