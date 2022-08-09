@@ -75,14 +75,16 @@ docker build --tag vcam_image .
 
 ```bash
 # For first run.
-docker run -it \
+docker run -ti \
+--ipc host \
+--net host \
 --name vcam_test_container \
 -e DISPLAY=$DISPLAY \
---env="QT_X11_NO_MITSHM=1" \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
+-v /dev/shm:/dev/shm \
 -v $(pwd):/home/guiuser/virtual_camera \
 -u 0  \
-vcam_image:latest /bin/bash
+ vcam_image:latest /bin/bash
 
 # For subsequent run.
 docker start vcam_test_container && docker exec -it vcam_test_container bash
