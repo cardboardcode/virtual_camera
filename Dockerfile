@@ -1,4 +1,4 @@
-FROM ros:foxy-ros-base-focal
+FROM ros:rolling-ros-base-focal
 
 MAINTAINER Bey Hao Yun <beyhy94@gmail.com>
 
@@ -17,7 +17,7 @@ WORKDIR /home/user/
 # Get ROS2 package image_tools available for sourcing.
 USER user
 RUN git clone https://github.com/ros2/demos.git \
-    --branch foxy \
+    --branch rolling_devel \
     --single-branch \
     --depth 1
 
