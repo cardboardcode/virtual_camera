@@ -1,4 +1,4 @@
-FROM ros:humble-ros-base-focal
+FROM ros:humble-ros-base-jammy
 
 MAINTAINER Bey Hao Yun <beyhy94@gmail.com>
 
