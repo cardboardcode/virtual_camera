@@ -69,7 +69,7 @@ ImageViewer::ImageViewer()
   qos.reliability(reliability_policy_);
 
   sub_1_ = this->create_subscription<sensor_msgs::msg::Image>(
-    "/image_viewer/image_input",
+    "/virtual_camera/image_raw",
     qos, std::bind(&ImageViewer::image_callback, this, std::placeholders::_1));
 }
 

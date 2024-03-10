@@ -14,12 +14,31 @@
 
 #include <memory>
 #include "virtual_camera/virtual_camera.hpp"
+#include "virtual_camera/image_viewer.hpp"
 
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<VirtualCamera>());
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+
+  // Connect the nodes as a pipeline: vcamera_node -> image_view_node
+  std::shared_ptr<VirtualCamera> vcamera_node = nullptr;
+  try {
+    vcamera_node = std::make_shared<VirtualCamera>();
+  } catch (const std::exception & e) {
+    fprintf(stderr, "%s Exiting ..\n", e.what());
+    return 1;
+  }
+
+  auto image_view_node = std::make_shared<ImageViewer>();
+
+  executor.add_node(vcamera_node);
+  executor.add_node(image_view_node);
+
+  executor.spin();
+
   rclcpp::shutdown();
   return 0;
 }
