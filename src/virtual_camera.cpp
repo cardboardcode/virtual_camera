@@ -38,14 +38,14 @@ int main(int argc, char * argv[])
   executor.add_node(vcamera_node);
 
   std::string use_image_viewer = "false";
-  if (argc == 1){
+  if (argc == 1) {
     use_image_viewer = "false";
   }
   else{
     use_image_viewer = argv[1];
   }
 
-  if (use_image_viewer == "true"){
+  if (use_image_viewer == "true") {
     executor.add_node(image_view_node);
   }
 
