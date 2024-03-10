@@ -40,7 +40,7 @@ int main(int argc, char * argv[])
   std::string use_image_viewer = "false";
   if (argc == 1) {
     use_image_viewer = "false";
-  } else { 
+  } else {
     use_image_viewer = argv[1];
   }
 
