@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <memory>
+#include "rclcpp/rclcpp.hpp"
 #include "virtual_camera/virtual_camera.hpp"
 #include "virtual_camera/image_viewer.hpp"
 
@@ -35,7 +36,18 @@ int main(int argc, char * argv[])
   auto image_view_node = std::make_shared<ImageViewer>();
 
   executor.add_node(vcamera_node);
-  executor.add_node(image_view_node);
+
+  std::string use_image_viewer = "false";
+  if (argc == 1){
+    use_image_viewer = "false";
+  }
+  else{
+    use_image_viewer = argv[1];
+  }
+
+  if (use_image_viewer == "true"){
+    executor.add_node(image_view_node);
+  }
 
   executor.spin();
 
