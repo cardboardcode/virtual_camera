@@ -12,15 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-import launch_ros.actions
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return LaunchDescription([
-        launch_ros.actions.Node(
+
+    my_param = DeclareLaunchArgument(
+        'my_param',
+        default_value='false',
+        description='Set use_image_viewer [yes/no]'
+    )
+
+    vcam_node = Node(
             package='virtual_camera',
             executable='virtual_camera',
             output='screen',
+            parameters=[{
+                'my_param': LaunchConfiguration('my_param')
+            }]
             )
+
+    return LaunchDescription([
+        my_param,
+        vcam_node
     ])
