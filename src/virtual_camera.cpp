@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
   // Declare a boolean parameter
   vcamera_node->declare_parameter("use_image_viewer", false);
 
-  // Get the boolean parameter value to determine 
+  // Get the boolean parameter value to determine
   // if the image_view_node should be activated.
   bool imageviewer_flag = vcamera_node->get_parameter("use_image_viewer").as_bool();
   RCLCPP_INFO(
