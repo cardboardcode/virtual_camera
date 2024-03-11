@@ -57,7 +57,9 @@ ImageViewer::ImageViewer()
 : Node("image_viewer")
 {
   cv::namedWindow("image_viewer", cv::WINDOW_AUTOSIZE);
-  cv::moveWindow("image_viewer", 0, 375);
+  int x_position = 0;
+  int y_position = 0;
+  cv::moveWindow("image_viewer", x_position, y_position);
   cv::waitKey(1);
 
   size_t depth_ = rmw_qos_profile_default.depth;
@@ -69,7 +71,7 @@ ImageViewer::ImageViewer()
   qos.reliability(reliability_policy_);
 
   sub_1_ = this->create_subscription<sensor_msgs::msg::Image>(
-    "/image_viewer/image_input",
+    "/virtual_camera/image_raw",
     qos, std::bind(&ImageViewer::image_callback, this, std::placeholders::_1));
 }
 
