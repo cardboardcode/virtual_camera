@@ -34,17 +34,17 @@ int main(int argc, char * argv[])
   }
 
   // Declare a boolean parameter within the main function
-  vcamera_node->declare_parameter("my_param", true);
+  vcamera_node->declare_parameter("use_image_viewer", false);
 
   // Get the parameter value
-  bool param_value = vcamera_node->get_parameter("my_param").as_bool();
-  RCLCPP_INFO(vcamera_node->get_logger(), "my_param value: %s", param_value ? "true" : "false");
+  bool imageviewer_flag = vcamera_node->get_parameter("use_image_viewer").as_bool();
+  RCLCPP_INFO(vcamera_node->get_logger(), "use_image_viewer set to: [%s]", imageviewer_flag ? "true" : "false");
 
   auto image_view_node = std::make_shared<ImageViewer>();
 
   executor.add_node(vcamera_node);
 
-  if (param_value) {
+  if (imageviewer_flag) {
     executor.add_node(image_view_node);
   }
 

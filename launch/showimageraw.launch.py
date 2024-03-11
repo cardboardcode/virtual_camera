@@ -21,8 +21,8 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    my_param = DeclareLaunchArgument(
-        'my_param',
+    imageviewer_flag_param = DeclareLaunchArgument(
+        'use_image_viewer',
         default_value='false',
         description='Set use_image_viewer [yes/no]'
     )
@@ -32,11 +32,11 @@ def generate_launch_description():
             executable='virtual_camera',
             output='screen',
             parameters=[{
-                'my_param': LaunchConfiguration('my_param')
+                'use_image_viewer': LaunchConfiguration('use_image_viewer')
             }]
             )
 
     return LaunchDescription([
-        my_param,
+        imageviewer_flag_param,
         vcam_node
     ])
