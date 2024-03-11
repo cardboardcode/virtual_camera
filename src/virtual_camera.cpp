@@ -37,16 +37,19 @@ int main(int argc, char * argv[])
   // Declare a boolean parameter
   vcamera_node->declare_parameter("use_image_viewer", false);
 
-  // Get the boolean parameter value to determine if the image_view_node should be activated.
+  // Get the boolean parameter value to determine 
+  // if the image_view_node should be activated.
   bool imageviewer_flag = vcamera_node->get_parameter("use_image_viewer").as_bool();
-  RCLCPP_INFO(vcamera_node->get_logger(), "use_image_viewer set to: [%s]", imageviewer_flag ? "true" : "false");
+  RCLCPP_INFO(
+    vcamera_node->get_logger(), "use_image_viewer set to: [%s]",
+    imageviewer_flag ? "true" : "false");
 
   // Instantiate ImageViewer ROS 2 node.
   auto image_view_node = std::make_shared<ImageViewer>();
   // Add VirtualCamera ROS 2 node to intra-process executor
   executor.add_node(vcamera_node);
 
-  // If use_image_viewer ROS 2 parameter is set to true at launch time, 
+  // If use_image_viewer ROS 2 parameter is set to true,
   // add ImageViewer ROS 2 node to intra-process executor.
   if (imageviewer_flag) {
     executor.add_node(image_view_node);
