@@ -16,9 +16,5 @@ WORKDIR /home/user/
 
 # Get ROS2 package image_tools available for sourcing.
 USER user
-RUN git clone https://github.com/ros2/demos.git \
-    --branch rolling \
-    --single-branch \
-    --depth 1
 
 WORKDIR /home/user
