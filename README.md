@@ -60,7 +60,7 @@ ros2 param set /virtual_camera FPS <an integer>
 
 ```
 
-#### **Docker Instructions** [[Optional]] :whale2:
+#### **Docker Instructions** [Optional] :whale2:
 
 This section is for **users who do not want to worry about installing all dependencies stated above**.
 
