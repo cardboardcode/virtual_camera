@@ -13,21 +13,29 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-import launch_ros.actions
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return LaunchDescription([
-        launch_ros.actions.Node(
+
+    imageviewer_flag_param = DeclareLaunchArgument(
+        'use_image_viewer',
+        default_value='false',
+        description='Set use_image_viewer [yes/no]'
+    )
+
+    vcam_node = Node(
             package='virtual_camera',
             executable='virtual_camera',
             output='screen',
-            ),
-        launch_ros.actions.Node(
-            package='virtual_camera',
-            executable='image_viewer',
-            output='log',
-            remappings=[('/image_viewer/image_input', '/virtual_camera/image_raw')]
-            ),
+            parameters=[{
+                'use_image_viewer': LaunchConfiguration('use_image_viewer')
+            }]
+            )
 
+    return LaunchDescription([
+        imageviewer_flag_param,
+        vcam_node
     ])
