@@ -60,7 +60,7 @@ ros2 param set /virtual_camera FPS <an integer>
 
 ```
 
-#### **Docker Instructions**
+#### **Docker Instructions** [Optional] :whale2:
 
 This section is for **users who do not want to worry about installing all dependencies stated above**.
 
@@ -73,6 +73,8 @@ docker build --tag vcam_image .
 **Run** the docker image.
 
 ```bash
+# Enable display to be forwarded from container to host.
+xhost +local:docker
 # For first run.
 sudo docker run -ti \
 --name vcam_test_container \
