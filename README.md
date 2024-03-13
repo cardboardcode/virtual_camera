@@ -1,3 +1,5 @@
+# :warning: DEPRECATED :warning:
+
 
 [![build](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml)
 [![codecov](https://codecov.io/gh/cardboardcode/virtual_camera/branch/main/graph/badge.svg?token=DITZXL86DN)](https://codecov.io/gh/cardboardcode/virtual_camera)
