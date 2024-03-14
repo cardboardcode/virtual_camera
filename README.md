@@ -81,7 +81,7 @@ docker run -it \
 --env="QT_X11_NO_MITSHM=1" \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -v $(pwd):/home/guiuser/virtual_camera \
--u 0  \
+-u 1000  \
 vcam_image:latest /bin/bash
 
 # For subsequent run.
