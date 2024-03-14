@@ -12,7 +12,7 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 1. [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
 2. ROS2 [Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html)
 
-## **Setup**
+## **Setup** :hammer:
 
 **Run** the command below.
 
@@ -24,19 +24,16 @@ source /opt/ros/foxy/setup.bash
 colcon build
 ```
 
+## **Run** :rocket:
+
+Run the commands below to run `virtual_camera` ROS 2 node:
+
 ```bash
 cd ~/virtual_camera
 source install/setup.bash
 ros2 run virtual_camera virtual_camera
 
 ros2 launch virtual_camera showimageraw.launch.py
-```
-
-```bash
-# For running without image-viewer
-./scripts/run.bash
-# For running with image-viewer
-./scripts/show_image.bash
 ```
 
 #### **Create A Static Video/Image**
