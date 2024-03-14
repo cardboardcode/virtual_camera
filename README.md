@@ -81,7 +81,7 @@ sudo docker run -ti \
 -v $(pwd):/home/user/virtual_camera \
 -e DISPLAY=$DISPLAY \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
--u 0  \
+-u 1000  \
  vcam_image:latest /bin/bash
 
 # For subsequent run.
