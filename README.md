@@ -1,4 +1,6 @@
-# :warning: DEPRECATED :warning:
+
+> [!WARNING]  
+> This branch has been **deprecated**. No further commits will be made here.
 
 
 [![build](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/industrial_ci_action.yml)
