@@ -8,10 +8,10 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: humble, ROS_REPO: main}
-          CCACHE_DIR: /github/home/.ccache
     runs-on: ubuntu-latest
     container:
-      image: ros:humble-ros-base-jammy
+      image: ros:humble-ros-base
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Build your ROS 2 package
+        run: |
+          colcon build
