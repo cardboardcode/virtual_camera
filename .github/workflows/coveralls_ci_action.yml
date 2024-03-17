@@ -8,8 +8,6 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: humble, ROS_REPO: main}
-        with:
-          working-directory: ./virtual_camera 
     runs-on: ubuntu-latest
     container:
       image: ros:humble-ros-base
