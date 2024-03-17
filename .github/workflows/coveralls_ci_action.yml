@@ -10,6 +10,11 @@ jobs:
           - {ROS_DISTRO: humble, ROS_REPO: main}
     runs-on: ubuntu-latest
     steps:
+      - name: Install ROS 2
+        run: |
+        sudo apt-get update && \
+          sudo apt install curl software-properties-common
+
       - name: Build your ROS 2 package
         run: |
           colcon build --symlink-install --cmake-args \
