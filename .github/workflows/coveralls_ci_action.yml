@@ -23,6 +23,7 @@ jobs:
 
       - name: Download ROS 2 dependencies
         run: |
+          rosdep update
           rosdep install -y --from-paths src --ignore-src \
           --rosdistro humble
 
