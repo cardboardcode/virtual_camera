@@ -19,7 +19,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
-          sudo apt-get install -y  ament-cmake
+          sudo apt-get install -y  ament-cmake ament-index-cpp
           pip install -U colcon-common-extensions
 
       - name: Download ROS 2 dependencies
