@@ -17,10 +17,7 @@ jobs:
 
       - name: Install ROS 2 dependencies (modify as needed)
         run: |
-          sudo apt update && sudo apt install -y \
-            python3-colcon-common-extensions \
-            python3-colcon-ridl \
-            python3-rclpy
+          pip install colcon-common-extensions
 
       - name: Setup ROS 2 environment (modify as needed)
         run: |
