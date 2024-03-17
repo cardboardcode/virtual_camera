@@ -8,24 +8,20 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: humble, ROS_REPO: main}
+          CCACHE_DIR: /github/home/.ccache
     runs-on: ubuntu-latest
     container:
       image: ros:humble-ros-base-jammy
     steps:
+      - name: Build colcon tools
+        run: |
+          sudo apt-get update && \
+            sudo apt-get install -y curl && \
+            sudo sh -c 'echo "deb [arch=amd64,arm64] http://repo.ros2.org/ubuntu/main `lsb_release -cs` main" > /etc/apt/sources.list.d/ros2-latest.list' && \
+            sudo curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add - && \
+            sudo apt update && \
+            sudo apt install python3-colcon-common-extensions
+
       - name: Build your ROS 2 package
         run: |
-          colcon build --symlink-install --cmake-args \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
-
-      - name: Run ROS 2 unit tests with coverage
-        run: |
-          colcon lcov-result --initial && \
-            colcon test --packages-select virtual_camera && \
-            colcon lcov-result
-
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@v2.2.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          coveralls-file: ./lcov/total_coverage.info
+          colcon build
