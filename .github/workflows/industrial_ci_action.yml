@@ -15,24 +15,25 @@ jobs:
       - uses: 'ros-industrial/industrial_ci@master'
         env: ${{matrix.env}}
 
-      - name: Install ROS 2 dependencies (modify as needed)
+      - name: Install ROS 2
         run: |
           pip install colcon-common-extensions
 
-      - name: Setup ROS 2 environment (modify as needed)
+      - name: Setup ROS 2 environment
         run: |
+          sudo apt install -y ros-humble-desktop && \
           source /opt/ros/humble/setup.bash
 
-      - name: Build your ROS 2 package (modify as needed)
+      - name: Build your ROS 2 package
         run: |
           colcon build --symlink-install --cmake-args \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
 
-      - name: Run ROS 2 unit tests with coverage (modify as needed)
+      - name: Run ROS 2 unit tests with coverage
         run: |
           colcon lcov-result --initial && \
-            colcon test --packages-select virtual_camera
+            colcon test --packages-select virtual_camera && \
             colcon lcov-result
 
       - name: Coveralls GitHub Action
