@@ -12,11 +12,15 @@ jobs:
     container:
       image: ros:humble-ros-base
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Build colcon tools
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
           pip install -U colcon-common-extensions
+
       - name: Build your ROS 2 package
         run: |
           pwd
