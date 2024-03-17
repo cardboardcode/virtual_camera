@@ -23,7 +23,7 @@ jobs:
 
       - name: Download ROS 2 dependencies
         run: |
-          source /opt/ros/humble/setup.bash
+          . /opt/ros/humble/setup.bash
           rosdep init
           rosdep install -y --from-paths src --ignore-src \
           --rosdistro humble
