@@ -1,0 +1,36 @@
+name: Coveralls CI
+
+on: [push, pull_request]
+
+jobs:
+  industrial_ci:
+    strategy:
+      matrix:
+        env:
+          - {ROS_DISTRO: humble, ROS_REPO: testing}
+          - {ROS_DISTRO: humble, ROS_REPO: main}
+    runs-on: ubuntu-latest
+    container:
+      image: ros-$ROS_DISTRO-ros-base:latest
+    steps:
+      - name: Install ROS 2
+        run: |
+          pip install colcon-common-extensions
+
+      - name: Build your ROS 2 package
+        run: |
+          colcon build --symlink-install --cmake-args \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
+
+      - name: Run ROS 2 unit tests with coverage
+        run: |
+          colcon lcov-result --initial && \
+            colcon test --packages-select virtual_camera && \
+            colcon lcov-result
+
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          coveralls-file: ./lcov/total_coverage.info
