@@ -10,25 +10,12 @@ jobs:
           - {ROS_DISTRO: humble, ROS_REPO: main}
     runs-on: ubuntu-latest
     container:
-      image: ros:humble-ros-base
+      image: ros:humble-perception-jammy
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build colcon tools
+      - name: Run script
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          sudo apt-get install -y  ament-cmake ros-humble-ament-index-cpp
-          pip install -U colcon-common-extensions
-
-      - name: Download ROS 2 dependencies
-        run: |
-          rosdep update
-          rosdep install -y --from-paths ./ --ignore-src \
-          --rosdistro humble
-
-      - name: Build your ROS 2 package
-        run: |
-          pwd
-          colcon build
+          chmod +x ./ci.sh
+          ./ci.sh
