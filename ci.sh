@@ -10,4 +10,10 @@ rosdep update
 rosdep install -y --from-paths ./ --ignore-src --rosdistro humble
 
 source /opt/ros/humble/setup.bash
-colcon build
+colcon build --symlink-install --cmake-args \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
+
+colcon lcov-result --initial
+colcon test --packages-select virtual_camera
+colcon lcov-result
