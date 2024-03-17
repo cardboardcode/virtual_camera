@@ -12,9 +12,4 @@ jobs:
     container:
       image: ros:humble-ros-base
     steps:
-      - name: Build colcon tools
-        run: |
-          pip install -U colcon-common-extensions
-      - name: Build your ROS 2 package
-        run: |
-          colcon build
+      - uses: actions/checkout@v2
