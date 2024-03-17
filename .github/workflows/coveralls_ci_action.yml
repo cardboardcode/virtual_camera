@@ -8,6 +8,8 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: humble, ROS_REPO: main}
+        with:
+          working-directory: ./virtual_camera 
     runs-on: ubuntu-latest
     container:
       image: ros:humble-ros-base
@@ -19,4 +21,5 @@ jobs:
           pip install -U colcon-common-extensions
       - name: Build your ROS 2 package
         run: |
+          pwd
           colcon build
