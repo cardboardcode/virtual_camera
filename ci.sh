@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sudo apt-get update
-sudo apt-get install -y lcov
+sudo apt-get install -y lcov curl
 sudo apt-get install -y python3-pip
 pip install -U colcon-common-extensions
 pip install -U colcon-lcov-result
