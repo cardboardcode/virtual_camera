@@ -10,7 +10,7 @@ jobs:
           - {ROS_DISTRO: humble, ROS_REPO: main}
     runs-on: ubuntu-latest
     container:
-      image: ros:humble-ros-core:latest
+      image: ros:humble-ros-base
     steps:
       - name: Install ROS 2
         run: |
