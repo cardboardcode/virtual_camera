@@ -21,6 +21,13 @@ jobs:
           sudo apt-get install -y python3-pip
           pip install -U colcon-common-extensions
 
+      - name: Download ROS 2 dependencies
+        run: |
+          source /opt/ros/humble/setup.bash
+          rosdep init
+          rosdep install -y --from-paths src --ignore-src \
+          --rosdistro humble
+
       - name: Build your ROS 2 package
         run: |
           pwd
