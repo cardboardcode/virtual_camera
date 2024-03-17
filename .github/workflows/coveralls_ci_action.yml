@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Install ROS 2
         run: |
-        sudo apt-get update && \
-          sudo apt install curl software-properties-common
+        sudo apt-get update
 
       - name: Build your ROS 2 package
         run: |
