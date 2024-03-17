@@ -7,11 +7,10 @@ jobs:
     strategy:
       matrix:
         env:
-          - {ROS_DISTRO: humble, ROS_REPO: testing}
           - {ROS_DISTRO: humble, ROS_REPO: main}
     runs-on: ubuntu-latest
     container:
-      image: ros-$ROS_DISTRO-ros-base:latest
+      image: ros:humble-ros-core:latest
     steps:
       - name: Install ROS 2
         run: |
