@@ -31,10 +31,7 @@ Run the commands below to run `virtual_camera` ROS 2 node:
 
 ```bash
 cd ~/virtual_camera
-source install/setup.bash
-ros2 run virtual_camera virtual_camera
-
-ros2 launch virtual_camera showimageraw.launch.py
+source install/local_setup.bash
 ```
 
 #### **Run Options**
