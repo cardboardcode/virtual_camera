@@ -80,7 +80,9 @@ docker build --tag vcam_image .
 # Enable display to be forwarded from container to host.
 xhost +local:docker
 # For first run.
-sudo docker run -ti \
+sudo docker run -it \
+--ipc host \
+--net host \
 --name vcam_test_container \
 -v $(pwd):/home/user/virtual_camera \
 -e DISPLAY=$DISPLAY \
