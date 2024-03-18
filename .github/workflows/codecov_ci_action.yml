@@ -1,0 +1,27 @@
+name: Code Coverage CI
+
+on: [push, pull_request]
+
+jobs:
+  codecov_ci:
+    strategy:
+      matrix:
+        env:
+          - {ROS_DISTRO: humble, ROS_REPO: main}
+    runs-on: ubuntu-latest
+    container:
+      image: ros:humble-perception-jammy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run script
+        run: |
+          chmod +x ./ci.sh
+          ./ci.sh
+
+      - name: Upload coverage reports to Codecov
+        run: |
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
