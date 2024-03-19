@@ -7,10 +7,21 @@ jobs:
     strategy:
       matrix:
         env:
-          - {ROS_DISTRO: rolling, ROS_REPO: testing}
           - {ROS_DISTRO: rolling, ROS_REPO: main}
     runs-on: ubuntu-latest
+    container:
+      image: ros:rolling-perception-jammy
     steps:
-      - uses: actions/checkout@v3
-      - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{matrix.env}}
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run script
+        run: |
+          chmod +x ./ci.sh
+          ./ci.sh
+
+      - name: Upload coverage reports to Codecov
+        run: |
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
