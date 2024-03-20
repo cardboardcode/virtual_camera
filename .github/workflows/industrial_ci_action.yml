@@ -4,10 +4,6 @@ on: [push, pull_request]
 
 jobs:
   industrial_ci:
-    strategy:
-      matrix:
-        env:
-          - {ROS_DISTRO: rolling, ROS_REPO: main}
     runs-on: ubuntu-latest
     container:
       image: ros:rolling-perception-jammy
