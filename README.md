@@ -57,6 +57,7 @@ ln -sf <image_file_name> input_data
 
 ```bash
 # You can choose not to do it manually by running the following script:
+# Input the number of the input image shown in the script -
 ./scripts/set_input_data.bash
 ```
 
