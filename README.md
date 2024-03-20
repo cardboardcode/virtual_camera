@@ -55,6 +55,12 @@ ln -sf <video_file_name> input_data
 ln -sf <image_file_name> input_data
 ```
 
+```bash
+# You can choose not to do it manually by running the following script:
+# Input the number of the input image shown in the script -
+./scripts/set_input_data.bash
+```
+
 #### **Control FPS**
 Run the following command to control the speed of the video
 
