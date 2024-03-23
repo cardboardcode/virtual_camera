@@ -70,7 +70,7 @@ This section is for **users who do not want to worry about installing all depend
 **Build** the docker image.
 
 ```bash
-docker build --tag vcam_image .
+docker build --tag vcam_image:foxy .
 ```
 
 **Run** the docker image.
@@ -82,14 +82,14 @@ xhost +local:docker
 docker run -it \
 --ipc host \
 --net host \
---name vcam_test_container \
+--name vcam_foxy_test_container \
 -v $(pwd):/home/user/virtual_camera \
 -e DISPLAY=$DISPLAY \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -u 1000  \
- vcam_image:latest /bin/bash
+ vcam_image:foxy /bin/bash
 
 # For subsequent run.
-docker start vcam_test_container && docker exec -it vcam_test_container bash
+docker start vcam_foxy_test_container && docker exec -it vcam_foxy_test_container bash
 
 ```
