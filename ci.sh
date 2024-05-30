@@ -18,6 +18,6 @@ colcon build --symlink-install --cmake-args \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
 
 # Generate code coverage report of virtual_camera ROS 2 package gtests
-colcon lcov-result --initial
-colcon test --packages-select virtual_camera
+colcon lcov-result --initial 
+colcon test --packages-select virtual_camera --rerun-failed --output-on-failure
 colcon lcov-result
