@@ -80,12 +80,15 @@ This section is for **users who do not want to worry about installing all depend
 docker build --tag vcam_image:jazzy .
 ```
 
-**Run** the docker image.
+**Enable** display to be forwarded from container to host.
 
 ```bash
-# Enable display to be forwarded from container to host.
+# 
 xhost +local:docker
-# For first run.
+```
+
+**Run** the docker image as container.
+```bash
 docker run -it \
 --ipc host \
 --net host \
@@ -95,8 +98,10 @@ docker run -it \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -u 1000  \
  vcam_image:jazzy /bin/bash
+```
 
-# For subsequent run.
+**Access the docker container:
+```bash
 docker start vcam_jazzy_test_container && docker exec -it vcam_humble_test_container bash
 
 ```
