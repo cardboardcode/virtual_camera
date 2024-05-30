@@ -1,6 +1,6 @@
 
 # Source local ROS2 distro
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 
 if [[ $1 == "update" ]]; then
   sudo rm -r build/ install/ log/ lcov/

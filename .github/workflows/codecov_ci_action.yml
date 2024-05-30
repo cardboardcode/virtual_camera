@@ -6,7 +6,7 @@ jobs:
   codecov_ci:
     runs-on: ubuntu-latest
     container:
-      image: ros:humble-perception-jammy
+      image: ros:jazzy-perception-noble
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

@@ -9,10 +9,10 @@ pip install -U colcon-lcov-result
 
 # Install ROS 2 dependencies
 rosdep update
-rosdep install -y --from-paths ./ --ignore-src --rosdistro humble
+rosdep install -y --from-paths ./ --ignore-src --rosdistro jazzy
 
 # Build virtual_camera ROS 2 package
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --cmake-args \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'

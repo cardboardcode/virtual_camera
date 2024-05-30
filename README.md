@@ -11,7 +11,7 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 ## **Dependencies**
 
 1. [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
-2. ROS2 [Humble Hawksbill](https://docs.ros.org/en/humble/Installation.html)
+2. ROS2 [Jazzy Jalisco](https://docs.ros.org/en/jazzy/Installation.html)
 
 ## **Setup** :hammer:
 
@@ -21,7 +21,7 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 cd $HOME
 git clone https://github.com/cardboardcode/virtual_camera.git --branch humble_devel --single-branch --depth 1
 cd ~/virtual_camera
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 colcon build
 ```
 
@@ -77,7 +77,7 @@ This section is for **users who do not want to worry about installing all depend
 **Build** the docker image.
 
 ```bash
-docker build --tag vcam_image:humble .
+docker build --tag vcam_image:jazzy .
 ```
 
 **Run** the docker image.
@@ -89,14 +89,14 @@ xhost +local:docker
 docker run -it \
 --ipc host \
 --net host \
---name vcam_humble_test_container \
+--name vcam_jazzy_test_container \
 -v $(pwd):/home/user/virtual_camera \
 -e DISPLAY=$DISPLAY \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -u 1000  \
- vcam_image:humble /bin/bash
+ vcam_image:jazzy /bin/bash
 
 # For subsequent run.
-docker start vcam_humble_test_container && docker exec -it vcam_humble_test_container bash
+docker start vcam_jazzy_test_container && docker exec -it vcam_humble_test_container bash
 
 ```
