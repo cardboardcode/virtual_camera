@@ -4,8 +4,8 @@
 sudo apt-get update
 sudo apt-get install -y lcov curl
 sudo apt-get install -y python3-pip
-pip3 install colcon-common-extensions
-pip3 install colcon-lcov-result
+sudo apt-get install -y python3-colcon-common-extensions
+sudo apt-get install -y python3-colcon-lcov-result
 
 # Install ROS 2 dependencies
 rosdep update
