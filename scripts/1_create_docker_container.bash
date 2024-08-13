@@ -3,7 +3,6 @@
 xhost +local:docker
 
 docker run -it --rm \
-    --ipc host \
     --net host \
     --name vcam_test_container \
     -e DISPLAY=$DISPLAY \
