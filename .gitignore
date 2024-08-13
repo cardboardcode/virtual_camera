@@ -2,6 +2,7 @@
 build/*
 install/*
 .vscode/*
+lcov/*
 log/*
 *.png
 *.jpeg
