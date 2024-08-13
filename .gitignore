@@ -1,6 +1,7 @@
 # Ignore types of files and or folders
 build/*
 install/*
+.vscode/*
 log/*
 *.png
 *.jpeg
