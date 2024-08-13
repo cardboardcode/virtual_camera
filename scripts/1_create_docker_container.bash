@@ -2,15 +2,16 @@
 
 xhost +local:docker
 
-docker run -ti \
---ipc host \
---net host \
---name vcam_test_container \
--e DISPLAY=$DISPLAY \
--v /tmp/.X11-unix:/tmp/.X11-unix \
--v /dev/shm:/dev/shm \
--v $(pwd):/home/user/virtual_camera \
--u 0  \
- vcam_image:latest /bin/bash
+docker run -it --rm \
+    --ipc host \
+    --net host \
+    --name vcam_test_container \
+    -e DISPLAY=$DISPLAY \
+    -v /dev/shm:/dev/shm \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -u user  \
+ vcam_image:humble bash -c \
+ "ros2 launch virtual_camera showimageraw.launch.py \
+ use_image_viewer:=true"
 
 xhost -local:docker
