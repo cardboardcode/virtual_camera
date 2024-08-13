@@ -96,8 +96,4 @@ docker run -it --rm \
  vcam_image:humble bash -c \
  "ros2 launch virtual_camera showimageraw.launch.py \
  use_image_viewer:=true"
-
-# For subsequent run.
-docker start vcam_humble_test_container && docker exec -it vcam_humble_test_container bash
-
 ```
