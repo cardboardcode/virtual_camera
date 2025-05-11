@@ -9,6 +9,9 @@ use opencv::{
     videoio,
 };
 
+use std::fs;
+use std::io;
+use std::path::Path;
 use std::{sync::Arc, thread, time::Duration};
 use builtin_interfaces::msg::Time as BuiltinTime;
 use rclrs::*;
@@ -130,6 +133,45 @@ impl ImagePublisher {
     }
 }
 
+fn detect_file_type(file_path: &Path) -> io::Result<String> {
+    let metadata = fs::metadata(file_path)?;
+    if !metadata.is_file() {
+        return Ok("Not a regular file".to_string());
+    }
+
+    // Read the first few bytes of the file to try and identify the magic number.
+    let mut file = fs::File::open(file_path)?;
+    let mut buffer = [0; 16]; // Read up to 16 bytes
+    let bytes_read = io::Read::read(&mut file, &mut buffer)?;
+
+    if bytes_read == 0 {
+        return Ok("Empty file".to_string());
+    }
+
+    println!("buffer = {:?}", buffer);
+
+    // Simple magic number detection (not exhaustive)
+    if buffer.starts_with(&[0xFF, 0xD8, 0xFF]) { // JPEG
+        return Ok("Image".to_string());
+    } else if buffer.starts_with(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) { //PNG
+        return Ok("Image".to_string());
+    } else if buffer.starts_with(&[0x47, 0x49, 0x46, 0x38]) { // GIF
+        return Ok("Image".to_string());
+    } else if buffer.starts_with(&[0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32]) // ftypmp42, ftypisom, etc.
+        || buffer.starts_with(&[0x00, 0x00, 0x01, 0xBA]) // MPEG program stream
+        || buffer.starts_with(&[0x00, 0x00, 0x01, 0xB3]) // MPEG video stream
+        || buffer.starts_with(&[0x4F, 0x67, 0x67, 0x53]) { // Ogg format (WebM, Ogg Vorbis, etc.)
+        return Ok("Video".to_string());
+    } else if buffer.starts_with(&[0x00, 0x00, 0x00, 0x18]) { // More MP4 variants
+        return Ok("Video".to_string());
+    } else if buffer.starts_with(&[0x1A, 0x45, 0xDF, 0xA3, 0xA3, 0x42]) { // MKV variants
+        return Ok("Video".to_string());
+    } else if buffer.starts_with(&[0x1A, 0x45, 0xDF]) { // WEBM variants
+        return Ok("Video".to_string());
+    }
+
+    Ok("a file type that cannot be determined.".to_string())
+}
 fn main() -> Result<(), RclrsError> {
     let mut executor = Context::default_from_env().unwrap().create_basic_executor();
     let publisher = Arc::new(ImagePublisher::new(&executor).unwrap());
@@ -147,23 +189,39 @@ fn main() -> Result<(), RclrsError> {
 
     // Try to open the file as a video.
     let mut cam = videoio::VideoCapture::from_file(&file_name, videoio::CAP_ANY).unwrap();
-    if cam.is_opened().unwrap() {
-        println!("{} is a video file.", file_name);
-    }
-    let mut frame = core::Mat::default();
-    let frame_read = videoio::VideoCapture::read(&mut cam, &mut frame); 
 
-    // Try to open the file as an image.
-    let image = imgcodecs::imread(file_name, imgcodecs::IMREAD_COLOR).unwrap();
-    if !image.empty() {
-        println!("{} is an image file.", file_name);
+    let mut frame = core::Mat::default();
+    let frame_read = videoio::VideoCapture::read(&mut cam, &mut frame);
+    let test_image = imgcodecs::imread(file_name, imgcodecs::IMREAD_COLOR).unwrap();
+
+    let file_path = Path::new(file_name);
+    let mut file_type = detect_file_type(file_path).unwrap();
+
+    let mut is_file_a_video: bool = false;
+    let mut is_file_an_image: bool = false;
+
+    if file_type.clone() == "Video" {
+        println!("file is a video.");
+        is_file_a_video = true;
+    } else if file_type.clone() == "Image" {
+        println!("file is a image.");
+        is_file_an_image = true;
     }
+
+    let mut success: bool = false;
 
     thread::spawn(move || loop {
         thread::sleep(Duration::from_millis(42));
-        let success = videoio::VideoCapture::read(&mut cam, &mut frame);
 
-        if !success.unwrap() {
+        if is_file_a_video {
+            success = videoio::VideoCapture::read(&mut cam, &mut frame).unwrap();
+        }
+        if is_file_an_image {
+            success = true;
+            frame = test_image.clone();
+        }
+
+        if !success {
             println!("Restarting video from the beginning.");
             cam.set(1, 0.0); // 1 is the property ID for frame position
             continue; // Go back to the beginning of the loop
