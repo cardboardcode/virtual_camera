@@ -4,6 +4,7 @@ install/*
 .vscode/*
 lcov/*
 log/*
+data/*
 *.png
 *.jpeg
 

@@ -1,0 +1,23 @@
+[package]
+name = "virtual_camera"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name="image_subscriber"
+path="src/image_subscriber.rs"
+
+[[bin]]
+name="image_publisher"
+path="src/image_publisher.rs"
+
+[dependencies]
+rclrs = "*"
+std_msgs = "*"
+sensor_msgs = "*"
+builtin_interfaces = "*"
+anyhow = {version = "1", features = ["backtrace"]}
+opencv = {version = "0.92.0", features = ["clang-runtime"]}
+
+[package.metadata.ros]
+install_to_share = ["launch"]

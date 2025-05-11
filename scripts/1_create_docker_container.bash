@@ -8,9 +8,9 @@ docker run -it --rm \
     -e DISPLAY=$DISPLAY \
     -v /dev/shm:/dev/shm \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v ./data:/workspace/data \
     -u user  \
- vcam_image:humble bash -c \
- "ros2 launch virtual_camera showimageraw.launch.py \
- use_image_viewer:=true"
+ vcam_image:humble_rust bash -c \
+ "ros2 launch virtual_camera run.launch"
 
 xhost -local:docker
