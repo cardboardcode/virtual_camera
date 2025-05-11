@@ -11,6 +11,7 @@ docker run -it --rm \
     -v ./data:/workspace/data \
     -u user  \
  vcam_image:humble_rust bash -c \
- "ros2 launch virtual_camera run.launch"
+ "ros2 launch virtual_camera run.launch.py \
+ use_image_viewer:=True"
 
 xhost -local:docker
