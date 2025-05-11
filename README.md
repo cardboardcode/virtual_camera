@@ -20,7 +20,7 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 **Run** the command below.
 
 ```bash
-
+WIP
 ```
 
 ## **Run** :rocket:
@@ -28,19 +28,20 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 Run the commands below to run `virtual_camera` ROS 2 node:
 
 ```bash
-
+WIP
 ```
 
 #### **Run Options**
 
 ```bash
-
+WIP
 ```
 
 #### **Create A Static Video/Image**
 
 ```bash
 
+```
 
 ```bash
 
@@ -50,7 +51,7 @@ Run the commands below to run `virtual_camera` ROS 2 node:
 Run the following command to control the speed of the video
 
 ```bash
-
+WIP
 ```
 
 #### **Docker Instructions** [Optional] :whale2:
@@ -60,11 +61,26 @@ This section is for **users who do not want to worry about installing all depend
 **Build** the docker image.
 
 ```bash
+docker build --tag vcam_image:humble_rust .
+```
 
+**Enable** X11-forwarding for showing GUI application from within docker container on host machine:
+
+```bash
+xhost +local:docker
 ```
 
 **Run** the docker image.
 
 ```bash
-
+docker run -it --rm \
+    --net host \
+    --name vcam_test_container \
+    -e DISPLAY=$DISPLAY \
+    -v /dev/shm:/dev/shm \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v ./data:/workspace/data \
+    -u user  \
+ vcam_image:humble_rust bash -c \
+ "ros2 launch virtual_camera run.launch"
 ```
