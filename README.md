@@ -19,39 +19,71 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 
 **Run** the command below.
 
+⚠️ Note that ROS2 Rust client library is still in early development with no official binaries released on buildfarm.
+
+Therefore, you will need to build certain ROS 2 packages from scratch
+
+1. Create a ROS 2 workspace
+
 ```bash
-WIP
+cd $HOME && mkdir -p ros2_rust_ws/src
 ```
+
+```bash
+cd ros2_rust_ws/src 
+```
+
+```bash
+git clone https://github.com/ros2-rust/ros2_rust.git --depth 1 --branch main --single-branch && cd $HOME/ros2_rust_ws
+```
+
+```bash
+vcs import src < src/ros2_rust/ros2_rust_humble.repos
+```
+
+```bash
+source /opt/ros/humble/setup.bash && colcon build
+```
+
+```bash
+git clone https://github.com/cardboardcode/virtual_camera.git --branch humble_rust_devel --depth 1 --single-branch src/virtual_camera
+```
+
+```bash
+source install/setup.bash && colcon build --packages-select virtual_camera
+```
+
+
+**Reference**: https://github.com/ros2-rust/ros2_rust/blob/main/docs/building.md
 
 ## **Run** :rocket:
 
 Run the commands below to run `virtual_camera` ROS 2 node:
 
 ```bash
-WIP
+source install/setup.bash
 ```
 
-#### **Run Options**
-
 ```bash
-WIP
+ros2 launch virtual_camera run.launch.py use_image_viewer:=True
 ```
 
 #### **Create A Static Video/Image**
 
 ```bash
-
+# Jump into a folder called data
+cd data
+# Move your intended video/image into this folder
+# Create a symbolic link to video.
+ln -sf <video_file_name> input_data
+# Or create a symbolic link to image.
+ln -sf <image_file_name> input_data
 ```
 
 ```bash
-
-```
-
-#### **Control FPS**
-Run the following command to control the speed of the video
-
-```bash
-WIP
+# You can choose not to do it manually by running the following script:
+# Input the number of the input image shown in the script -
+./scripts/set_input_data.bash
 ```
 
 #### **Docker Instructions** [Optional] :whale2:
