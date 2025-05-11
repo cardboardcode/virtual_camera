@@ -8,7 +8,7 @@
 
 A ROS2 package that **simulates a camera**, providing ROS messages from **playing a static video or image**.
 
-⚠️ This is an experimental Rust-based implementation that still uses memory-safe function calls. Use it at your own risk.
+⚠️ This is an experimental Rust-based implementation that still uses memory-unsafe function calls. Use it at your own risk.
 
 ## **Dependencies**
 
