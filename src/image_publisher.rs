@@ -1,25 +1,20 @@
-use opencv::core::{Mat};
-use opencv::prelude::MatTraitConst;
-use opencv::{
-    imgcodecs, Result,
-};
+use std::{fs,io,path::Path};
+use std::io::Write;
+use std::{sync::Arc, thread, time::Duration};
+use opencv::core::Mat;
 use opencv::{
     core,
+    imgcodecs,
     prelude::*,
+    Result,
     videoio,
 };
-
-use std::fs;
-use std::io;
-use std::path::Path;
-use std::{sync::Arc, thread, time::Duration};
 use builtin_interfaces::msg::Time as BuiltinTime;
 use rclrs::*;
 
 struct ImagePublisher {
     node: Arc<Node>,
     publisher: Arc<Publisher<sensor_msgs::msg::Image>>,
-    image: Result<Mat>,
 }
 
 impl ImagePublisher {
@@ -27,17 +22,9 @@ impl ImagePublisher {
         let node = executor.create_node("image_publisher").unwrap();
         let publisher = node.create_publisher("/virtual_camera/image_raw").unwrap();
 
-        let image_path = "/workspace/data/test.jpg";
-
-        // TODO(cardboardcode): Implement feature to automatically detect if video or image
-
-        // Read the image using imread
-        let test_image = imgcodecs::imread(image_path, imgcodecs::IMREAD_COLOR);
-
         Ok(Self { 
             node: node,
             publisher : publisher,
-            image: test_image,
         })
     }
 
@@ -102,33 +89,11 @@ impl ImagePublisher {
         Ok(msg)
     }
 
-    fn publish_data(&self, increment: usize, input_img: &mut Mat) -> Result<usize, RclrsError> {
-        
-        let clock = self.node.get_clock();
-        let now: Time = clock.now();
-        let duration = std::time::Duration::from_nanos(now.nsec.try_into().unwrap());
+    fn publish_data(&self, increment: usize, input_img: &mut Mat) -> Result<usize, RclrsError> {  
 
-        let image_msg = self.mat_to_ros_image_dynamic_encoding(input_img);
-        // let image_msg = self.image.as_ref().map(|img| self.mat_to_ros_image_dynamic_encoding(img));
+        let image_msg = self.mat_to_ros_image_dynamic_encoding(input_img).unwrap();
 
-        let mut local_image_msg = image_msg.unwrap();
-
-        let real_image_msg = sensor_msgs::msg::Image {
-            header: std_msgs::msg::Header {
-                stamp: BuiltinTime{
-                     sec: duration.as_secs().try_into().unwrap(),
-                     nanosec: duration.subsec_nanos().try_into().unwrap(),
-                },
-                frame_id: "map".to_string(),
-            },
-            height: local_image_msg.height,
-            width: local_image_msg.width,
-            encoding: local_image_msg.encoding.clone(),
-            is_bigendian: 0,
-            step: local_image_msg.step,
-            data: local_image_msg.data.clone(),
-        };
-        self.publisher.publish(real_image_msg)?;
+        self.publisher.publish(image_msg)?;
         Ok(increment + 1)
     }
 }
@@ -228,7 +193,7 @@ fn main() -> Result<(), RclrsError> {
         }
 
         count = publisher_other_thread.publish_data(count, &mut frame).unwrap();
-        println!("Publishing [test image] - {}", cursor[count]);
+        println!("\rPublishing [test image] - {}", cursor[count]);
 
         if count == 3 {
             count = 0;
