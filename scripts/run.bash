@@ -2,4 +2,4 @@
 
 source /opt/ros/humble/setup.bash
 source install/setup.bash
-ros2 run virtual_camera virtual_camera
+ros2 launch virtual_camera run.launch
