@@ -24,21 +24,14 @@ fn ros_image_to_mat(msg: &sensor_msgs::msg::Image) -> Result<Mat, opencv::Error>
         }
     };
 
-    println!(
-        "Encoding: {}, Size: {}x{}, Step: {}, Data len: {}",
-        msg.encoding,
-        msg.width,
-        msg.height,
-        msg.step,
-        msg.data.len()
-    );
-
-    // Create Mat from raw buffer
-    // let mat = Mat::new_rows_cols_with_data(
-    //     msg.height as i32,
-    //     msg.width as i32,
-    //     &msg.data
-    // )?;
+    // println!(
+    //     "Encoding: {}, Size: {}x{}, Step: {}, Data len: {}",
+    //     msg.encoding,
+    //     msg.width,
+    //     msg.height,
+    //     msg.step,
+    //     msg.data.len()
+    // );
 
     let mat = unsafe {
         Mat::new_rows_cols_with_data_unsafe(
@@ -64,21 +57,6 @@ fn ros_image_to_mat(msg: &sensor_msgs::msg::Image) -> Result<Mat, opencv::Error>
     }
 }
 
-fn image_msg_to_mat(msg: &sensor_msgs::msg::Image) -> opencv::Result<Mat> {
-
-    println!(
-        "Received image with width: {}, height: {}, encoding: {}",
-        msg.width,
-        msg.height,
-        msg.encoding
-    );
-
-    let size = Size::new(msg.width.try_into().unwrap(), msg.height.try_into().unwrap());
-    let white_color = Scalar::new(255.0, 255.0, 255.0, 0.0); // BGR (and alpha, though not used here for a 3-channel image)
-    let image = Mat::new_size_with_default(size, CV_8UC3, white_color)?;
-    Ok(image)
-}
-
 fn main() -> Result<(), Error> {
     let context = Context::default_from_env()?;
     let mut executor = context.create_basic_executor();
@@ -91,7 +69,7 @@ fn main() -> Result<(), Error> {
         "/virtual_camera/image_raw",
         move |msg: sensor_msgs::msg::Image| {
             num_messages += 1;
-            println!("Image received...");
+            // println!("Image received...");
             // let white_image = image_msg_to_mat(&msg);
 
             match ros_image_to_mat(&msg){
@@ -100,7 +78,7 @@ fn main() -> Result<(), Error> {
                     // println!("Image dimensions: {}x{}", mat.rows, mat.cols);
                     // Perform operations on 'mat'
                     highgui::imshow("Image Subscriber", &mat);
-                    highgui::wait_key(1);
+                    highgui::wait_key(20);
                 }
                 Err(err) => {
                     // An error occurred
@@ -110,7 +88,7 @@ fn main() -> Result<(), Error> {
             }
 
 
-            println!("(Got {} messages so far)", num_messages);
+            // println!("(Got {} messages so far)", num_messages);
         },
     )?;
 

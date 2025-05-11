@@ -194,6 +194,7 @@ fn main() -> Result<(), RclrsError> {
 
         count = publisher_other_thread.publish_data(count, &mut frame).unwrap();
         println!("\rPublishing [test image] - {}", cursor[count]);
+        io::stdout().flush().unwrap();
 
         if count == 3 {
             count = 0;
