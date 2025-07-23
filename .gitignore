@@ -6,6 +6,8 @@ lcov/*
 log/*
 *.png
 *.jpeg
+*.mkv
+*.mp4
 
 # Ignore specific file
 data/input_data
