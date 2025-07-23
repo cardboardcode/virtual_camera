@@ -18,23 +18,16 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 **Run** the command below.
 
 ```bash
-cd $HOME
-git clone https://github.com/cardboardcode/virtual_camera.git --branch humble_devel --single-branch --depth 1
-cd ~/virtual_camera
-source /opt/ros/humble/setup.bash
-colcon build
+git clone https://github.com/cardboardcode/virtual_camera.git --branch humble_devel --single-branch --depth 1 && cd virtual_camera
+```
+
+```bash 
+source /opt/ros/humble/setup.bash && colcon build
 ```
 
 ## **Run** :rocket:
 
 Run the commands below to run `virtual_camera` ROS 2 node:
-
-```bash
-cd ~/virtual_camera
-source install/local_setup.bash
-```
-
-#### **Run Options**
 
 ```bash
 # For running without image-viewer
