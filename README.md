@@ -79,5 +79,5 @@ docker build --tag vcam_image:humble .
 bash scripts/2_create_docker_container.bash
 ```
 
-#### **Maintainer(s)** :glasses:
+#### **Maintainer(s)** :eyeglasses:
 - [cardboardcode](https://github.com/cardboardcode)
