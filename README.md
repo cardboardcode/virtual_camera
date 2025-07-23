@@ -18,23 +18,16 @@ A ROS2 package that **simulates a camera**, providing ROS messages from **playin
 **Run** the command below.
 
 ```bash
-cd $HOME
-git clone https://github.com/cardboardcode/virtual_camera.git --branch humble_devel --single-branch --depth 1
-cd ~/virtual_camera
-source /opt/ros/jazzy/setup.bash
-colcon build
+git clone https://github.com/cardboardcode/virtual_camera.git --branch jazzy_devel --single-branch --depth 1 && cd virtual_camera
+```
+
+```bash 
+source /opt/ros/jazzy/setup.bash && colcon build
 ```
 
 ## **Run** :rocket:
 
 Run the commands below to run `virtual_camera` ROS 2 node:
-
-```bash
-cd ~/virtual_camera
-source install/local_setup.bash
-```
-
-#### **Run Options**
 
 ```bash
 # For running without image-viewer
@@ -80,28 +73,11 @@ This section is for **users who do not want to worry about installing all depend
 docker build --tag vcam_image:jazzy .
 ```
 
-**Enable** display to be forwarded from container to host.
+**Run** the docker image.
 
 ```bash
-# 
-xhost +local:docker
+bash scripts/2_create_docker_container.bash
 ```
 
-**Run** the docker image as container.
-```bash
-docker run -it \
---ipc host \
---net host \
---name vcam_jazzy_test_container \
--v $(pwd):/home/user/virtual_camera \
--e DISPLAY=$DISPLAY \
--v /tmp/.X11-unix:/tmp/.X11-unix \
--u 1000  \
- vcam_image:jazzy /bin/bash
-```
-
-**Access the docker container:
-```bash
-docker start vcam_jazzy_test_container && docker exec -it vcam_humble_test_container bash
-
-```
+#### **Maintainer(s)** :eyeglasses:
+- [cardboardcode](https://github.com/cardboardcode)
