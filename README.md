@@ -76,17 +76,8 @@ docker build --tag vcam_image:humble .
 **Run** the docker image.
 
 ```bash
-# Enable display to be forwarded from container to host.
-xhost +local:docker
-# Run virtual_camera in docker container, vcam_test_container
-docker run -it --rm \
-    --net host \
-    --name vcam_test_container \
-    -e DISPLAY=$DISPLAY \
-    -v /dev/shm:/dev/shm \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -u user  \
- vcam_image:humble bash -c \
- "ros2 launch virtual_camera showimageraw.launch.py \
- use_image_viewer:=true"
+bash scripts/2_create_docker_container.bash
 ```
+
+#### **Maintainer(s)** :glasses:
+- [cardboardcode](https://github.com/cardboardcode)
