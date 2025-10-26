@@ -1,4 +1,4 @@
-# Copyright 2022 Bey Hao Yun
+# Copyright 2025 Bey Hao Yun
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,19 +23,43 @@ def generate_launch_description():
     imageviewer_flag_param = DeclareLaunchArgument(
         'use_image_viewer',
         default_value='false',
-        description='Set use_image_viewer [yes/no]'
+        description='Set use_image_viewer [true/false]'
     )
 
-    vcam_node = Node(
+    use_debug_param = DeclareLaunchArgument(
+        'use_debug',
+        default_value='false',
+        description='Enable debug logging output [true/false]'
+    )
+
+    # Create LaunchConfigurations
+    use_debug = LaunchConfiguration('use_debug')
+
+    # Build arguments dynamically at runtime
+    # This approach is safe because launch will evaluate LaunchConfiguration later
+    def make_node_arguments(context):
+        if context.perform_substitution(use_debug) == 'true':
+            return ['--ros-args', '--log-level', 'virtual_camera:=debug']
+        else:
+            return []
+
+    from launch.actions import OpaqueFunction
+    def make_vcam_node(context, *args, **kwargs):
+        return [Node(
             package='virtual_camera',
             executable='virtual_camera',
             output='screen',
             parameters=[{
                 'use_image_viewer': LaunchConfiguration('use_image_viewer')
-            }]
-            )
+            }],
+            arguments=make_node_arguments(context)
+        )]
+
+    vcam_node_action = OpaqueFunction(function=make_vcam_node)
 
     return LaunchDescription([
         imageviewer_flag_param,
-        vcam_node
+        use_debug_param,
+        vcam_node_action
     ])
+
