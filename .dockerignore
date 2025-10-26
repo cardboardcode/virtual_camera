@@ -1,4 +1,5 @@
 data/
+scripts/
 build/
 codecov.yml
 CONTRIBUTING.md
