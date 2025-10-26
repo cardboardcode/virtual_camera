@@ -92,7 +92,7 @@ public:
     if (rcpputils::fs::exists(FILE_PATH_TO_DATA_FOLDER)) {
       RCLCPP_INFO(this->get_logger(), "[ %s ] - FOUND. Proceeding... \n", DATA_FOLDER_NAME.c_str());
     } else {
-      RCLCPP_INFO(
+      RCLCPP_WARN(
         this->get_logger(), "[ %s ] - MISSING. Creating [ %s ] folder... \n",
         DATA_FOLDER_NAME.c_str(),
         DATA_FOLDER_NAME.c_str());
@@ -115,7 +115,7 @@ public:
 
       // If failed to load image proper, load default image.
       if (img.empty()) {
-        RCLCPP_INFO(
+        RCLCPP_WARN(
           this->get_logger(),
           "[ %s ] - IMAGE EMPTY. Assigning DEFAULT_IMAGE  \n",
           (FILE_PATH_TO_PACKAGE + FILE_PATH_TO_DEFAULT_IMAGE).c_str());
@@ -138,7 +138,7 @@ public:
 
   sensor_msgs::msg::Image process_timer_callback()
   {
-    // RCLCPP_INFO(this->get_logger(), "Publishing Image");
+    RCLCPP_DEBUG(this->get_logger(), "Publishing Image");
     rclcpp::Parameter int_param = this->get_parameter("FPS");
     int new_fps = int_param.as_int();
 
