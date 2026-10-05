@@ -1,13 +1,25 @@
-# Ignore types of files and or folders
-build/*
-install/*
-.vscode/*
-lcov/*
-log/*
-data/*
+# Colcon/ROS 2 build artifacts
+build/
+install/
+log/
+lcov/
+AMENT_IGNORE
+
+# Rust
+/target
+
+# Test data and media
+data/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
 *.png
 *.jpeg
-
-# Ignore specific file
-data/input_data
-AMENT_IGNORE
