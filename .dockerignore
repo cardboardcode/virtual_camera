@@ -1,0 +1,38 @@
+# VCS
+.git
+.gitignore
+
+# Build artifacts (colcon / cargo)
+build/
+install/
+log/
+target/
+lcov/
+
+# Test media / input data (runtime input, mounted at container start)
+data/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI / coverage
+codecov.yml
+
+# Documentation not needed in the image
+LICENSE
+CONTRIBUTING.md
+README.md
+IMPLEMENTATION.md
+AGENTS.md
+scripts/
+.github/
+
+# Docker itself
+Dockerfile
+.dockerignore
