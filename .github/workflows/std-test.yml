@@ -1,0 +1,82 @@
+# CI for the std-only logic test suite in `src/logic.rs` (the 24 tests).
+#
+# WHY a "probe" crate instead of `cargo test --no-default-features`:
+#   The optional `rclrs` / `std_msgs` / `sensor_msgs` / `builtin_interfaces`
+#   crates are NOT published to crates.io — they only resolve from a built
+#   `ros2_rust` workspace. So running the tests straight in this package
+#   cannot resolve its manifest on a bare toolchain. Instead we copy the
+#   single, dependency-free `logic.rs` into a throwaway crate and run its
+#   tests. This is exactly the loop documented in `IMPLEMENTATION.md`
+#   ("Verify commands") so CI and contributors stay in sync.
+#
+# The two ROS/OpenCV binaries are NOT exercised here (they need a ros2_rust
+# workspace + colcon); see AGENTS.md "Crate layout & test strategy".
+
+name: std-test
+
+on:
+  push:
+    branches: [main, master, humble_rust_devel]
+    paths:
+      - "src/logic.rs"
+      - "src/lib.rs"
+      - "Cargo.toml"
+      - ".github/workflows/std-test.yml"
+  pull_request:
+    paths:
+      - "src/logic.rs"
+      - "src/lib.rs"
+      - "Cargo.toml"
+      - ".github/workflows/std-test.yml"
+  workflow_dispatch:
+
+env:
+  RUST_TOOLCHAIN: stable
+
+jobs:
+  logic-tests:
+    name: std-only logic tests (probe)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: clippy, rustfmt
+
+      - name: Set up throwaway probe crate
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/vcam_probe
+          mkdir -p /tmp/vcam_probe
+          cat > /tmp/vcam_probe/Cargo.toml <<'EOF'
+          [package]
+          name = "vcam_probe"
+          version = "0.0.0"
+          edition = "2021"
+          publish = false
+
+          [lib]
+          path = "logic.rs"
+          EOF
+          cp src/logic.rs /tmp/vcam_probe/logic.rs
+
+      - name: Format check (logic.rs)
+        working-directory: /tmp/vcam_probe
+        run: cargo fmt --check
+
+      - name: Run logic tests (24)
+        working-directory: /tmp/vcam_probe
+        run: cargo test -- --nocapture
+
+      - name: Clippy (no warnings)
+        working-directory: /tmp/vcam_probe
+        run: |
+          set -euo pipefail
+          out="$(cargo clippy 2>&1)"
+          echo "$out"
+          [[ "$out" == *warning* || "$out" == *error* ]] && exit 1 || true

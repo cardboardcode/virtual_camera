@@ -15,10 +15,13 @@ Guidance for AI agents (and humans) working in this repository. Describes the co
 ## Repository Layout
 
 ```
-Cargo.toml        Rust package manifest; two [[bin]] targets
+Cargo.toml        Rust package manifest; one [lib] + two [[bin]] targets (both `required-features=["ros"]`)
+IMPLEMENTATION.md Test-suite design doc (strategy, coverage table, status, verify commands)
 src/
-  image_publisher.rs   Publisher node: reads data/input_data (video or image), publishes Image
-  image_subscriber.rs  Subscriber node: receives Image, displays via OpenCV highgui
+  lib.rs               `pub mod logic;` (crate doc: layout + how to run the std-only test suite)
+  logic.rs             std-only shared logic (FileKind, MatSpec, encoding/header/magic-byte helpers) + 24 tests
+  image_publisher.rs   Publisher node: reads data/input_data (video or image), publishes Image  [gated: ros]
+  image_subscriber.rs  Subscriber node: receives Image, displays via OpenCV highgui            [gated: ros]
 package.xml       ament package metadata (ROS name: virtual_camera, version 0.0.0)
 launch/
   run.launch.py   Launches image_publisher; conditionally image_subscriber
@@ -38,6 +41,31 @@ codecov.yml       lcov coverage config
 |---|---|---|
 | `image_publisher` | `image_publisher` | Publisher on `/virtual_camera/image_raw` (hardcoded) |
 | `image_subscriber` | `image_subscriber` | Subscriber on `/virtual_camera/image_raw` (hardcoded), shows `Image Subscriber` HWindow |
+
+### Crate layout & test strategy (feature-gated, two-tier)
+
+- **Cargo feature `ros` (default-on)** gates `rclrs`, `std_msgs`, `sensor_msgs`, `builtin_interfaces`, and `opencv`. Both `[[bin]]` targets declare `required-features=["ros"]`, so a build *without* the `ros` feature fails to build the bins but still builds the `virtual_camera` lib.
+- **`src/logic.rs` is the pure, std-only core** (magic-byte sniffing, `MatSpec`/encoding lookups, `image_header_fields` header math, `detect_file_kind`). It holds **24 unit tests** and no native deps. The logic is duplicated conceptually in the two bins but the bins are thin ROS/OpenCV glue around it.
+- The ROS message crates and `rclrs` are **not on crates.io** — they only resolve from a built `ros2_rust` workspace. So a bare `cargo build`/`cargo test` on a clean machine cannot resolve them regardless of features.
+- **Two verification tiers:**
+  1. **std-only (anywhere, bare Rust toolchain):** copy `src/logic.rs` into a scratch lib crate and run `cargo test` — the documented *probe* pattern in `IMPLEMENTATION.md`. This is the fast, dependency-free loop for the pure logic + tests.
+  2. **full package (needs `ros2_rust` workspace):** `colcon build` then `colcon test --packages-select virtual_camera` — validates the ROS/OpenCV bins that the std-only suite does *not* cover.
+- Bin code (publisher / subscriber) is **not** covered by the std-only suite; see `IMPLEMENTATION.md` "Remaining risks / notes".
+
+### The 24 std-only tests (what they cover)
+
+All live in `src/logic.rs` (`#[cfg(test)] mod tests`), exercise the std-only core, and run with **no ROS/OpenCV** — a bare Rust toolchain suffices. 24 tests across 6 areas:
+
+| Area | Tests (n) | What they assert |
+|---|---|---|
+| **Magic-byte classification** | 7 | JPEG/PNG/GIF → `FileKind::Image`; MP4 `ftyp`+`mp42`, MPEG PS/VS (`00 00 01 BA/B3`), `OggS`, EBML/MKV → `Video`; near-miss prefixes (`FF D8 00`, `ftypisom`, truncated `FF D8`) rejected; garbage + empty header → `Unknown`. Covers `matches_image_magic`, `matches_video_magic`, `classify_magic_bytes`. |
+| **`detect_file_kind` (real filesystem)** | 5 | Real temp JPEG file → Image; real temp MP4 file → Video; empty file → Unknown; missing file → `io::Error`; a directory → Unknown. |
+| **`subscriber_mat_spec`** | 4 | All 6 encodings map to a `MatSpec`; `rgb8`/`rgba8` set `convert_rgb` (BGR/mono do not); `cv_type` decodes to correct OpenCV `depth` (bits 0–2) + `channels` (`(>>3)+1`) for all mappings; 7 bad encodings (empty, `mono32`, `bgr16`, `yuv420p`, `BGRA8`, …) → `None`. |
+| **`publisher_encoding`** | 3 | The 4 publishable combos → correct labels (`mono8`/`bgr8`/`bgra8`/`mono16`); 0/2/5-channel, 16-bit BGR, and any `CV_32F`/`CV_64F` → `None` (no panic). |
+| **`image_header_fields` (pure math)** | 2 | `step == width × channels` for 6×(3,4) shapes; bad depth → `None`; zero-height still computes `step` (returns `(0, 3, 9, "bgr8")`). |
+| **Round-trip consistency** | 1 | Every label the publisher emits is accepted by `subscriber_mat_spec`; all `SUPPORTED_ENCODINGS` are non-empty ASCII-alnum strings. |
+
+**Not covered** (out of scope for std-only): the two ROS/OpenCV bins (`image_publisher.rs`, `image_subscriber.rs`) — needs a `ros2_rust` workspace; see "Remaining risks" in `IMPLEMENTATION.md`.
 
 ### Data source conventions (surprising — be careful)
 
@@ -90,6 +118,19 @@ scripts/generate_cov_report.bash [update|clean]
 scripts/view_cov_report.bash
 ```
 
+Run the **std-only logic test suite** (no ROS/OpenCV needed) via the probe pattern
+from `IMPLEMENTATION.md`:
+
+```bash
+# Throwaway scratch crate compiles src/logic.rs and runs its 24 tests:
+cp src/logic.rs /tmp/vcam_probe/logic.rs
+cd /tmp/vcam_probe && cargo test
+
+# Full package (requires a ros2_rust workspace where the msg crates resolve):
+colcon build
+colcon test --packages-select virtual_camera
+```
+
 ## Conventions & Process
 
 - **DCO sign-off required:** every commit needs `Signed-off-by: ...` (`scripts` / CONTRIBUTING.md mandate `git commit -s`).
@@ -104,5 +145,5 @@ scripts/view_cov_report.bash
 2. `change_fps.bash` sets a `FPS` parameter that no executable actually reads; FPS is fixed by the 42 ms sleep.
 3. `mat_to_ros_image_dynamic_encoding` has `todo!()` for unsupported depth/channel combos (e.g., grayscale 16-bit with alpha, floating point depth) — will panic if encountered.
 4. `image_subscriber.rs` keeps an unused `num_messages` counter and commented-out debug logging — dead weight, safe to prune.
-5. No test suite is present in-tree; `colcon test` runs empty (lcov report generated from C++ side only).
+5. The std-only test suite in `src/logic.rs` (24 tests) covers the pure logic (magic bytes, encoding/header lookups, file-kind detection) but **not** the ROS/OpenCV bins; `colcon test` still exercises only what the bins reach. See "Crate layout & test strategy" above for the two-tier verification flow.
 6. The package is explicitly flagged as experimental / memory-unsafe in the README; new code that calls into `rclrs`/`opencv` unsafe APIs should keep the "use at your own risk" warning truthful.

@@ -3,21 +3,67 @@ name = "virtual_camera"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name="image_subscriber"
-path="src/image_subscriber.rs"
+[lib]
+name = "virtual_camera"
+path = "src/lib.rs"
 
 [[bin]]
-name="image_publisher"
-path="src/image_publisher.rs"
+name = "image_publisher"
+path = "src/image_publisher.rs"
+required-features = ["ros"]
+
+[[bin]]
+name = "image_subscriber"
+path = "src/image_subscriber.rs"
+required-features = ["ros"]
+
+[features]
+default = ["ros"]
+ros = [
+    "dep:rclrs",
+    "dep:std_msgs",
+    "dep:sensor_msgs",
+    "dep:builtin_interfaces",
+    "dep:opencv",
+]
 
 [dependencies]
-rclrs = "*"
-std_msgs = "*"
-sensor_msgs = "*"
-builtin_interfaces = "*"
-anyhow = {version = "1", features = ["backtrace"]}
-opencv = {version = "0.92.0", features = ["clang-runtime"]}
+anyhow = { version = "1", features = ["backtrace"] }
+
+# All ROS / native dependencies are optional (feature `ros`, on by default).
+# The generated message crates (`std_msgs`, `sensor_msgs`, `builtin_interfaces`)
+# and `rclrs` are only available from a built ros2_rust workspace — they are
+# NOT published on crates.io — so this package must be built with
+# `colcon build` (ament_cargo) inside that workspace. A plain `cargo build`
+# on a bare machine will not be able to resolve these crates.
+#
+# They are also feature-gated so that CI and contributors with a bare Rust
+# toolchain can still run the std-only logic test suite:
+#
+#     cargo test --no-default-features   # only the `virtual_camera::logic` tests
+#
+# (See `src/logic.rs` — no rclrs, no opencv, no generated msg types.)
+
+# opencv is optional for the same reason (native C++ library + clang codegen).
+opencv = { version = "0.92.0", features = ["clang-runtime"], optional = true }
+
+[dependencies.rclrs]
+version = "*"
+optional = true
+
+[dependencies.std_msgs]
+version = "*"
+optional = true
+
+[dependencies.sensor_msgs]
+version = "*"
+optional = true
+
+[dependencies.builtin_interfaces]
+version = "*"
+optional = true
+
+[dev-dependencies]
 
 [package.metadata.ros]
 install_to_share = ["launch"]
