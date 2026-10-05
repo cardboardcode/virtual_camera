@@ -30,7 +30,6 @@ Dockerfile        Full in-container build of ros2_rust + this package (user "use
 data/             Input media + the `input_data` symlink (git-ignored; publisher reads data/input_data)
 build/ install/ log/ target/   colcon/cargo artifacts (git-ignored)
 CONTRIBUTING.md   Apache-2 license terms + DCO sign-off requirement
-codecov.yml       lcov coverage config
 ```
 
 ## Key As-Built Facts (read before editing)
@@ -92,7 +91,7 @@ All live in `src/logic.rs` (`#[cfg(test)] mod tests`), exercise the std-only cor
 
 ### CI / coverage
 
-- `README.md` shows CI build (industrial_ci), codecov, and license badges; the workflow files live on the remote (`.github/` is not present in this checkout).
+- `README.md` shows CI build (industrial_ci) and license badges; the workflow files live on the remote (`.github/` is not present in this checkout).
 - Coverage flow: `scripts/generate_cov_report.bash` → colcon build with gcov flags → `colcon test` → `colcon lcov-result`; view with `scripts/view_cov_report.bash` (opens `lcov/index.html` in firefox). `lcov/` is git-ignored.
 - `scripts/*.bash`: `build.bash` (colcon build), `run.bash` (launch), `show_image.bash` (launch with viewer true), `set_input_data.bash` (interactive symlink picker), `change_fps.bash` (sets unused param, see above), `0_build_docker_image.bash` / `1_create_docker_container.bash`.
 

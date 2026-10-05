@@ -12,7 +12,7 @@
 # The two ROS/OpenCV binaries are NOT exercised here (they need a ros2_rust
 # workspace + colcon); see AGENTS.md "Crate layout & test strategy".
 
-name: std-test
+name: CI
 
 on:
   push:
@@ -21,13 +21,13 @@ on:
       - "src/logic.rs"
       - "src/lib.rs"
       - "Cargo.toml"
-      - ".github/workflows/std-test.yml"
+      - ".github/workflows/CI.yml"
   pull_request:
     paths:
       - "src/logic.rs"
       - "src/lib.rs"
       - "Cargo.toml"
-      - ".github/workflows/std-test.yml"
+      - ".github/workflows/CI.yml"
   workflow_dispatch:
 
 env:

@@ -21,8 +21,6 @@ data/
 .DS_Store
 Thumbs.db
 
-# CI / coverage
-codecov.yml
 
 # Documentation not needed in the image
 LICENSE
