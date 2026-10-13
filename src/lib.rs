@@ -86,8 +86,28 @@ impl MediaSource {
 
         info!("Target media path: {:?}", input_path);
 
-        // Attempt 1: Try reading as video
+        let is_image_ext = if let Ok(target) = input_path.canonicalize() {
+            let ext = target
+                .extension()
+                .and_then(|s| s.to_str())
+                .unwrap_or("")
+                .to_lowercase();
+            matches!(ext.as_str(), "jpg" | "jpeg" | "png" | "bmp" | "webp")
+        } else {
+            false
+        };
+
         if input_path.exists() {
+            if is_image_ext {
+                if let Ok(img) = imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR) {
+                    if !img.empty() {
+                        info!("Successfully loaded static image from {:?}", input_path);
+                        return Ok(MediaSource::Image { img });
+                    }
+                }
+            }
+
+            // Attempt 1: Try reading as video
             if let Ok(mut cap) = VideoCapture::from_file(
                 &input_path.to_string_lossy(),
                 VideoCaptureAPIs::CAP_ANY as i32,

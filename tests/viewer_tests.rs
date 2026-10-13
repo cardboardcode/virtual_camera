@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use std::sync::atomic::Ordering;
+use opencv::core::Mat;
 use virtual_camera::viewer::ImageViewer;
 
 #[test]
@@ -20,6 +21,13 @@ fn test_image_viewer_headless() {
     let viewer = ImageViewer::new(true);
     let stop_handle = viewer.get_stop_handle();
     assert!(stop_handle.load(Ordering::Relaxed));
+}
+
+#[test]
+fn test_image_viewer_show_mat_headless() {
+    let viewer = ImageViewer::new(true);
+    let mat = Mat::default();
+    assert!(viewer.show_mat(&mat).is_ok());
 }
 
 #[test]

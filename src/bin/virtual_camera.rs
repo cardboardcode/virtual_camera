@@ -69,21 +69,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let mut camera = VirtualCamera::new(&args.ws_url, args.fps, &data_dir).await?;
     let stop_cam = camera.get_stop_handle();
 
-    // Spawn optional in-process image viewer
-    let viewer_handle = if args.use_image_viewer {
-        info!("Spawning in-process ImageViewer...");
-        let ws_url = args.ws_url.clone();
-        let headless = args.headless;
-        Some(tokio::spawn(async move {
-            let mut viewer = ImageViewer::new(headless);
-            if let Err(e) = viewer.run(&ws_url).await {
-                log::error!("In-process ImageViewer error: {}", e);
-            }
-        }))
-    } else {
-        None
-    };
-
     // Listen for Ctrl-C signal
     let stop_handle = stop_cam.clone();
     tokio::spawn(async move {
@@ -93,13 +78,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
     });
 
-    // Run publisher loop
-    if let Err(e) = camera.run().await {
-        log::error!("VirtualCamera encountered error: {}", e);
-    }
+    if args.use_image_viewer {
+        info!("Starting in-process ImageViewer on main thread...");
+        let (frame_tx, mut frame_rx) = tokio::sync::mpsc::channel::<opencv::core::Mat>(2);
+        camera.set_frame_sender(frame_tx);
 
-    if let Some(vh) = viewer_handle {
-        vh.abort();
+        let viewer = ImageViewer::new(args.headless);
+        let viewer_stop = viewer.get_stop_handle();
+
+        // Spawn camera publication loop in Tokio task
+        let cam_stop = stop_cam.clone();
+        let cam_task = tokio::spawn(async move {
+            if let Err(e) = camera.run().await {
+                log::error!("VirtualCamera encountered error: {}", e);
+            }
+        });
+
+        // Run viewer event and display loop on the OS main thread
+        while cam_stop.load(Ordering::Relaxed) && viewer_stop.load(Ordering::Relaxed) {
+            match frame_rx.recv().await {
+                Some(frame) => {
+                    let _ = viewer.show_mat(&frame);
+                }
+                None => break,
+            }
+        }
+
+        cam_stop.store(false, Ordering::Relaxed);
+        let _ = cam_task.await;
+    } else {
+        // Run publisher loop directly on main thread
+        if let Err(e) = camera.run().await {
+            log::error!("VirtualCamera encountered error: {}", e);
+        }
     }
 
     info!("virtual_camera shut down gracefully.");

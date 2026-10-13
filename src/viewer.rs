@@ -47,6 +47,18 @@ impl ImageViewer {
         self.running.clone()
     }
 
+    /// Display an OpenCV Mat in the GUI window if not in headless mode.
+    pub fn show_mat(&self, mat: &Mat) -> Result<(), opencv::Error> {
+        if !self.headless && !mat.empty() {
+            highgui::imshow("image_viewer", mat)?;
+            let key = highgui::wait_key(1)?;
+            if key == 27 || key == 113 {
+                self.running.store(false, Ordering::Relaxed);
+            }
+        }
+        Ok(())
+    }
+
     /// Map ROS image encoding string to number of channels.
     pub fn encoding_to_channels(encoding: &str) -> Result<i32, String> {
         match encoding {
@@ -89,20 +101,20 @@ impl ImageViewer {
 
         while self.running.load(Ordering::Relaxed) {
             tokio::select! {
+                biased;
                 msg = subscriber.next() => {
                     match Self::decode_image(&msg) {
                         Ok(mat) => {
-                            if !self.headless {
-                                let _ = highgui::imshow("image_viewer", &mat);
-                                let _ = highgui::wait_key(1);
-                            }
+                            let _ = self.show_mat(&mat);
                         }
                         Err(e) => {
                             warn!("Failed to decode received image: {}", e);
                         }
                     }
                 }
-                _ = tokio::time::sleep(std::time::Duration::from_millis(100)) => {}
+                _ = tokio::time::sleep(std::time::Duration::from_millis(500)), if !self.running.load(Ordering::Relaxed) => {
+                    break;
+                }
             }
         }
 

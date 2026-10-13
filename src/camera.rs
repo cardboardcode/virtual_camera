@@ -18,6 +18,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use log::{debug, error, info};
+use opencv::core::Mat;
 use roslibrust::rosbridge::{ClientHandle, Publisher};
 
 use crate::{
@@ -30,6 +31,7 @@ pub struct VirtualCamera {
     cursor_pos: usize,
     publisher: Publisher<SensorImage>,
     running: Arc<AtomicBool>,
+    frame_sender: Option<tokio::sync::mpsc::Sender<Mat>>,
 }
 
 impl VirtualCamera {
@@ -54,7 +56,13 @@ impl VirtualCamera {
             cursor_pos: 0,
             publisher,
             running: Arc::new(AtomicBool::new(true)),
+            frame_sender: None,
         })
+    }
+
+    /// Register an optional frame sender channel for in-process frame forwarding.
+    pub fn set_frame_sender(&mut self, tx: tokio::sync::mpsc::Sender<Mat>) {
+        self.frame_sender = Some(tx);
     }
 
     /// Dynamically update publishing frame rate.
@@ -90,6 +98,10 @@ impl VirtualCamera {
                     continue;
                 }
             };
+
+            if let Some(ref tx) = self.frame_sender {
+                let _ = tx.try_send(frame.clone());
+            }
 
             let msg = match mat_to_sensor_msgs_image(&frame, "world") {
                 Ok(m) => m,

@@ -15,6 +15,7 @@
 
 set -e
 
+xhost +local:root || true
 xhost +local:docker || true
 
 docker run -it --rm \
@@ -28,3 +29,4 @@ docker run -it --rm \
     "ros2 launch virtual_camera showimageraw.launch.py use_image_viewer:=true"
 
 xhost -local:docker || true
+xhost -local:root || true
