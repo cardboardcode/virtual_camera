@@ -32,12 +32,26 @@ COPY . .
 RUN . /opt/ros/$ROS_DISTRO/setup.sh \
     && cargo build --release
 
-# Install binaries into standard executable paths
-RUN mkdir -p /virtual_camera_ws/install/virtual_camera/lib/virtual_camera \
+# Install binaries into standard system and ROS paths, and register into ROS 2 ament index
+RUN mkdir -p /usr/local/bin \
     && cp target/release/virtual_camera /usr/local/bin/ \
     && cp target/release/image_viewer /usr/local/bin/ \
+    && mkdir -p /opt/ros/$ROS_DISTRO/lib/virtual_camera \
+    && cp target/release/virtual_camera /opt/ros/$ROS_DISTRO/lib/virtual_camera/ \
+    && cp target/release/image_viewer /opt/ros/$ROS_DISTRO/lib/virtual_camera/ \
+    && mkdir -p /opt/ros/$ROS_DISTRO/share/virtual_camera/launch \
+    && cp launch/showimageraw.launch.py /opt/ros/$ROS_DISTRO/share/virtual_camera/launch/ \
+    && cp package.xml /opt/ros/$ROS_DISTRO/share/virtual_camera/ \
+    && mkdir -p /opt/ros/$ROS_DISTRO/share/ament_index/resource_index/packages \
+    && touch /opt/ros/$ROS_DISTRO/share/ament_index/resource_index/packages/virtual_camera \
+    && mkdir -p /virtual_camera_ws/install/virtual_camera/lib/virtual_camera \
     && cp target/release/virtual_camera /virtual_camera_ws/install/virtual_camera/lib/virtual_camera/ \
-    && cp target/release/image_viewer /virtual_camera_ws/install/virtual_camera/lib/virtual_camera/
+    && cp target/release/image_viewer /virtual_camera_ws/install/virtual_camera/lib/virtual_camera/ \
+    && mkdir -p /virtual_camera_ws/install/virtual_camera/share/virtual_camera/launch \
+    && cp launch/showimageraw.launch.py /virtual_camera_ws/install/virtual_camera/share/virtual_camera/launch/ \
+    && cp package.xml /virtual_camera_ws/install/virtual_camera/share/virtual_camera/ \
+    && mkdir -p /virtual_camera_ws/install/virtual_camera/share/ament_index/resource_index/packages \
+    && touch /virtual_camera_ws/install/virtual_camera/share/ament_index/resource_index/packages/virtual_camera
 
 RUN echo '#!/bin/bash\n\
 set -e\n\
