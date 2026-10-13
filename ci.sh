@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
+# Copyright 2026 Bey Hao Yun
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# Install dependencies
-sudo apt-get update
-sudo apt-get install -y lcov curl
-sudo apt-get install -y python3-pip
-sudo apt-get install -y python3-colcon-common-extensions
-sudo apt-get install -y python3-colcon-lcov-result
+set -e
 
-# Install ROS 2 dependencies
-rosdep update
-rosdep install -y --from-paths ./ --ignore-src --rosdistro jazzy
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$REPO_ROOT"
 
-# Build virtual_camera ROS 2 package
-source /opt/ros/jazzy/setup.bash
-colcon build --symlink-install --cmake-args \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
-
-# Generate code coverage report of virtual_camera ROS 2 package gtests
-colcon lcov-result --initial 
-colcon test --packages-select virtual_camera --rerun-failed --output-on-failure
-colcon lcov-result
+echo "=== Running Containerized Test Battery for virtual_camera (Rust) ==="
+bash scripts/run_container_tests.bash

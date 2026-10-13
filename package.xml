@@ -3,25 +3,19 @@
 <package format="3">
   <name>virtual_camera</name>
   <version>0.1.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="beyhy@artc.a-star.edu.sg">rosi</maintainer>
-  <license>Apache 2.0</license>
+  <description>Simulated camera feed streaming images as ROS 2 sensor_msgs/Image in Rust</description>
+  <maintainer email="beyhy@artc.a-star.edu.sg">Bey Hao Yun</maintainer>
+  <license>Apache-2.0</license>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>ament_index_cpp</depend>
-  <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
-  <depend>cv_bridge</depend>
   <depend>std_msgs</depend>
-  <build_depend>libopencv-dev</build_depend>
+  <depend>builtin_interfaces</depend>
+  <depend>rosbridge_server</depend>
+  <depend>rmw_cyclonedds_cpp</depend>
 
   <exec_depend>libopencv-dev</exec_depend>
 
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
-  <test_depend>ament_cmake_gtest</test_depend>
-
   <export>
-    <build_type>ament_cmake</build_type>
+    <build_type>ament_cargo</build_type>
   </export>
 </package>
