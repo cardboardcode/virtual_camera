@@ -19,19 +19,15 @@ A pure **Rust** ROS 2 package that **simulates a camera feed** by streaming stat
 bash scripts/1_build_docker_image.bash
 ```
 
-## **Configure**
+## **Configure** :wrench:
 
-Set your custom video media file to be published on ROS 2 topic:
+Use the interactive helper to select which media file in `data/` gets published on the ROS 2 topic. It lists the available files and points `input_data` at your choice:
 
 ```bash
-cd data
-
-# Point to sample video
-ln -sf video.mp4 input_data
-
-# Point to sample image
-ln -sf nadezhda_diskant.jpg input_data
+bash scripts/set_input_data.bash
 ```
+
+To update the selection later, simply place your new media file in `data/` and re-run the script.
 
 ## **Run** :rocket:
 
