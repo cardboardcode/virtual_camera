@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 
 echo "Please input the FPS integer (1-200)"
 read -r input

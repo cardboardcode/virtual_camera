@@ -29,6 +29,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:jazzy
+          tags: ghcr.io/${{ github.repository }}:humble
           cache-from: type=gha
           cache-to: type=gha,mode=max

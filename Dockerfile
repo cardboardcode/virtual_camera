@@ -1,5 +1,5 @@
-ARG ROS_DISTRO=jazzy
-FROM ros:$ROS_DISTRO-perception-noble
+ARG ROS_DISTRO=humble
+FROM ros:$ROS_DISTRO-perception-jammy
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install ROS 2 packages and build dependencies

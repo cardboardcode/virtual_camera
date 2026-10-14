@@ -8,7 +8,7 @@ A pure **Rust** ROS 2 package that **simulates a camera feed** by streaming stat
 ## **Dependencies** :books:
 
 1. Docker
-2. ROS 2 [Jazzy Jalisco](https://docs.ros.org/en/jazzy/Installation.html)
+2. ROS 2 [Humble Hawksbill](https://docs.ros.org/en/humble/Installation.html)
 3. Rust 1.85+ (when building on host)
 4. `roslibrust`, `tokio`, `opencv` (Rust crate)
 

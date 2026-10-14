@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$REPO_ROOT"
 
-IMAGE_NAME="vcam_image:jazzy"
+IMAGE_NAME="vcam_image:humble"
 
 echo "=================================================="
 echo " STEP 1: Building Docker image ($IMAGE_NAME)"

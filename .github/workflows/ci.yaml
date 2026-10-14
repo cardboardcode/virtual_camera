@@ -7,12 +7,12 @@ jobs:
     name: "Lint, Compile & Test"
     runs-on: ubuntu-latest
     container:
-      image: ros:jazzy-perception-noble
+      image: ros:humble-perception-jammy
     defaults:
       run:
         shell: bash
     env:
-      ROS_DISTRO: jazzy
+      ROS_DISTRO: humble
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

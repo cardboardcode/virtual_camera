@@ -2,7 +2,7 @@
 
 > **Repository:** `virtual_camera`  
 > **Status:** Active development (Branch: `jazzy_rust_devel` / `jazzy_devel`)  
-> **Target Platform:** ROS 2 Jazzy Jalisco on Ubuntu 24.04 LTS (Noble Numbat)  
+> **Target Platform:** ROS 2 Humble Hawksbill on Ubuntu 22.04 LTS (Jammy Jellyfish)  
 > **Maintainer:** Bey Hao Yun (`cardboardcode`, `beyhy@artc.a-star.edu.sg`)  
 
 ---
@@ -44,7 +44,7 @@ virtual_camera/
 ├── README.md                           # User documentation & setup instructions
 ├── AGENTS.md                           # Operational guide for AI agents
 ├── IMPLEMENTATION_PLAN.md              # Phased Rust migration plan
-├── Dockerfile                          # Multi-stage container build (ros:jazzy-perception-noble)
+├── Dockerfile                          # Multi-stage container build (ros:humble-perception-jammy)
 ├── .dockerignore                       # Excludes build artifacts from Docker context
 ├── ci.sh                               # CI containerized test execution script
 ├── codecov.yml                         # Codecov configuration
@@ -64,7 +64,7 @@ virtual_camera/
 │   ├── camera_tests.rs                 # Unit & integration tests for media fallback and conversions
 │   └── viewer_tests.rs                 # Tests for viewer and headless windowing
 └── scripts/
-    ├── 1_build_docker_image.bash       # Builds Docker image vcam_image:jazzy
+    ├── 1_build_docker_image.bash       # Builds Docker image vcam_image:humble
     ├── 2_create_docker_container.bash  # Runs Docker container with X11 GUI forwarding
     ├── run_container_tests.bash        # Automated test suite running inside Docker
     ├── test_ros2_e2e.bash              # In-container end-to-end DDS topic verification
@@ -80,7 +80,7 @@ virtual_camera/
 ## 3. Technology Stack & Dependencies
 
 - **Language & Standards:** Rust 2021 edition (`rustc` 1.85+), Python 3 (launch files & tooling).
-- **ROS 2 Middleware:** ROS 2 Jazzy Jalisco (`rosbridge_server`, `rmw_cyclonedds_cpp`, `sensor_msgs`, `std_msgs`).
+- **ROS 2 Middleware:** ROS 2 Humble Hawksbill (`rosbridge_server`, `rmw_cyclonedds_cpp`, `sensor_msgs`, `std_msgs`).
 - **Rust Client:** `roslibrust` (0.26+) with `tokio` (1.38+).
 - **Computer Vision:** OpenCV (`opencv` Rust bindings v0.93 linking to system `libopencv-dev`).
 - **Testing:** `cargo test`, `xvfb-run` for headless GUI verification, in-container ROS 2 topic verification.
@@ -106,7 +106,7 @@ bash scripts/2_create_docker_container.bash
 
 ### Local Compilation (Host with ROS 2 & Rust)
 ```bash
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 cargo build --release
 ```
 
