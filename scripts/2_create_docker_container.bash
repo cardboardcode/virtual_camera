@@ -15,6 +15,10 @@
 
 set -e
 
+# Target distro (default rolling; override: ROS_DISTRO=jazzy bash this-script)
+ROS_DISTRO="${ROS_DISTRO:-rolling}"
+IMAGE_TAG="vcam_image:${ROS_DISTRO}"
+
 xhost +local:root || true
 xhost +local:docker || true
 
@@ -22,10 +26,11 @@ docker run -it --rm \
     --network host \
     --name vcam_test_container \
     -e DISPLAY="$DISPLAY" \
+    -e ROS_DISTRO="$ROS_DISTRO" \
     -e RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v "$(pwd)/data":/virtual_camera_ws/src/virtual_camera/data \
-    vcam_image:jazzy bash -c \
+    "$IMAGE_TAG" bash -c \
     "ros2 launch virtual_camera showimageraw.launch.py use_image_viewer:=true"
 
 xhost -local:docker || true

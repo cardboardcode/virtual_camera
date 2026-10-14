@@ -1,8 +1,8 @@
 # AGENTS.md
 
 > **Repository:** `virtual_camera`  
-> **Status:** Active development (Branch: `jazzy_rust_devel` / `jazzy_devel`)  
-> **Target Platform:** ROS 2 Jazzy Jalisco on Ubuntu 24.04 LTS (Noble Numbat)  
+> **Status:** Active development (Rust implementation)  
+> **Target Platform:** ROS 2 **Jazzy Jalisco** (Ubuntu 24.04 Noble) **and** **Rolling Ridley** (Ubuntu 26.04 Resolute) — one source tree, built via `ROS_DISTRO`  
 > **Maintainer:** Bey Hao Yun (`cardboardcode`, `beyhy@artc.a-star.edu.sg`)  
 
 ---
@@ -44,10 +44,9 @@ virtual_camera/
 ├── README.md                           # User documentation & setup instructions
 ├── AGENTS.md                           # Operational guide for AI agents
 ├── IMPLEMENTATION_PLAN.md              # Phased Rust migration plan
-├── Dockerfile                          # Multi-stage container build (ros:jazzy-perception-noble)
+├── Dockerfile                          # Container build (ros:$ROS_DISTRO-perception)
 ├── .dockerignore                       # Excludes build artifacts from Docker context
-├── ci.sh                               # CI containerized test execution script
-├── codecov.yml                         # Codecov configuration
+├── build.rs                            # Distro detection + roslibrust message codegen
 ├── data/
 │   ├── nadezhda_diskant.jpg            # Default fallback test image
 │   └── video.mp4                       # Sample test video
@@ -64,7 +63,7 @@ virtual_camera/
 │   ├── camera_tests.rs                 # Unit & integration tests for media fallback and conversions
 │   └── viewer_tests.rs                 # Tests for viewer and headless windowing
 └── scripts/
-    ├── 1_build_docker_image.bash       # Builds Docker image vcam_image:jazzy
+    ├── 1_build_docker_image.bash       # Builds Docker image vcam_image:<ros_distro>
     ├── 2_create_docker_container.bash  # Runs Docker container with X11 GUI forwarding
     ├── run_container_tests.bash        # Automated test suite running inside Docker
     ├── test_ros2_e2e.bash              # In-container end-to-end DDS topic verification
@@ -80,7 +79,7 @@ virtual_camera/
 ## 3. Technology Stack & Dependencies
 
 - **Language & Standards:** Rust 2021 edition (`rustc` 1.85+), Python 3 (launch files & tooling).
-- **ROS 2 Middleware:** ROS 2 Jazzy Jalisco (`rosbridge_server`, `rmw_cyclonedds_cpp`, `sensor_msgs`, `std_msgs`).
+- **ROS 2 Middleware:** ROS 2 Jazzy Jalisco **or** Rolling Ridley — the active distro is chosen at build time via `ROS_DISTRO` (`rosbridge_server`, `rmw_cyclonedds_cpp`, `sensor_msgs`, `std_msgs`).
 - **Rust Client:** `roslibrust` (0.26+) with `tokio` (1.38+).
 - **Computer Vision:** OpenCV (`opencv` Rust bindings v0.93 linking to system `libopencv-dev`).
 - **Testing:** `cargo test`, `xvfb-run` for headless GUI verification, in-container ROS 2 topic verification.
@@ -89,24 +88,34 @@ virtual_camera/
 
 ## 4. Build, Run, and Test Workflows
 
+The build is **distro-parameterized by a single knob, `ROS_DISTRO`** (default `jazzy`).
+The plain `ros:<distro>-perception` Docker tag tracks the current Ubuntu codename for that
+distro (jazzy → noble, rolling → resolute), so no codename is ever hard-coded. At build time,
+`build.rs` detects the active distro and the `roslibrust_codegen_macro::generate_ros_types!`
+proc-macro reads message schemas from `/opt/ros/<distro>/share/`, so **one source tree builds
+for both**.
+
 ### Building the Docker Container
 ```bash
-bash scripts/1_build_docker_image.bash
+bash scripts/1_build_docker_image.bash          # -> vcam_image:jazzy (default)
+ROS_DISTRO=rolling bash scripts/1_build_docker_image.bash   # -> vcam_image:rolling
 ```
 
 ### Running Automated Tests in Container
 ```bash
-bash scripts/run_container_tests.bash
+bash scripts/run_container_tests.bash           # tests against jazzy
+ROS_DISTRO=rolling bash scripts/run_container_tests.bash
 ```
 
 ### Running the Container with GUI Forwarding
 ```bash
 bash scripts/2_create_docker_container.bash
+ROS_DISTRO=rolling bash scripts/2_create_docker_container.bash
 ```
 
 ### Local Compilation (Host with ROS 2 & Rust)
 ```bash
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/<distro>/setup.bash   # e.g. /opt/ros/jazzy or /opt/ros/rolling
 cargo build --release
 ```
 
@@ -137,7 +146,11 @@ cargo build --release
    - Automated tests and verification must be verified using `scripts/run_container_tests.bash` inside the Docker container.
 2. **Headless Safety**:
    - Any GUI-related OpenCV test must use `xvfb-run` or headless verification to avoid crashing in display-less environments.
-3. **Commit Standards**:
+3. **Distro Parameterization**:
+   - Never hard-code a distro name or Ubuntu codename in source, the Dockerfile, the CI/publish
+     workflows, or shell scripts. Always drive off `ROS_DISTRO` (default `jazzy`). The one
+     codegen dependency on `ROS_DISTRO` is resolved by `build.rs` at build time.
+4. **Commit Standards**:
    - DCO sign-off (`git commit -s`).
    - Gitmoji commit prefixes (`:sparkles:`, `:hammer:`, `:recycle:`, `:memo:`, `:bug:`).
    - Apache 2.0 license headers on all newly created source files.

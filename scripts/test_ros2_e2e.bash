@@ -15,7 +15,11 @@
 
 set -e
 
-source /opt/ros/jazzy/setup.bash
+# ROS_DISTRO is inherited from the container env (set by runner / entrypoint);
+# default to rolling for local execution outside a container.
+ROS_DISTRO="${ROS_DISTRO:-rolling}"
+echo "Sourcing ROS 2 distro: ${ROS_DISTRO}"
+source /opt/ros/${ROS_DISTRO}/setup.bash
 
 echo "=== [1/4] Starting rosbridge_websocket server ==="
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml > /tmp/rosbridge.log 2>&1 &

@@ -29,13 +29,12 @@ use opencv::imgcodecs;
 use opencv::prelude::*;
 use opencv::videoio::{self, VideoCapture, VideoCaptureAPIs};
 
-// Generate ROS 2 message definitions for sensor_msgs and std_msgs at compile time
-roslibrust_codegen_macro::generate_ros_types!(
-    "/opt/ros/jazzy/share/std_msgs",
-    "/opt/ros/jazzy/share/builtin_interfaces",
-    "/opt/ros/jazzy/share/geometry_msgs",
-    "/opt/ros/jazzy/share/sensor_msgs"
-);
+// Generate ROS 2 message definitions (sensor_msgs, std_msgs, builtin_interfaces,
+// geometry_msgs) at compile time. The build script (build.rs) probes the active
+// ROS_DISTRO and emits a `generate_ros_types!` invocation with literal message
+// paths into OUT_DIR; we splice it in here. This keeps one source tree that
+// compiles against either Jazzy or Rolling.
+include!(concat!(env!("OUT_DIR"), "/ros_types.rs"));
 
 pub use builtin_interfaces::Time;
 pub use sensor_msgs::Image as SensorImage;
