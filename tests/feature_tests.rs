@@ -22,9 +22,12 @@
 //! rosbridge broker or a display. Actual topic receipt over DDS is covered by
 //! `scripts/test_ros2_e2e.bash`.
 
+use clap::Parser;
 use opencv::prelude::*;
 use virtual_camera::viewer::ImageViewer;
-use virtual_camera::{frame_interval, get_data_dir, mat_to_sensor_msgs_image, MediaSource};
+use virtual_camera::{
+    frame_interval, get_data_dir, mat_to_sensor_msgs_image, CliArgs, MediaSource,
+};
 
 /// Load media the way the node does (image, video, or fallback) and grab a frame.
 fn load_a_frame() -> opencv::core::Mat {
@@ -110,6 +113,39 @@ fn test_fps_change_clamped_for_non_positive_rate() {
     );
 }
 
+#[test]
+fn test_cli_default_fps_matches_package_default() {
+    // The node's `--fps` default must stay in sync with DEFAULT_FPS.
+    let args = CliArgs::parse_from(["virtual_camera"]);
+    assert_eq!(args.fps, virtual_camera::DEFAULT_FPS);
+}
+
+#[test]
+fn test_cli_fps_override_changes_publish_rate() {
+    // `--fps <int>` must change the rate the node actually uses to compute
+    // the inter-frame delay of its publishing loop.
+    let args = CliArgs::parse_from(["virtual_camera", "--fps", "48"]);
+    assert_eq!(args.fps, 48);
+    assert_eq!(
+        frame_interval(args.fps),
+        frame_interval(48),
+        "the parsed CLI FPS must drive the frame interval used by the loop"
+    );
+    assert_eq!(
+        frame_interval(args.fps),
+        std::time::Duration::from_millis(1000 / 48),
+        "48 FPS must publish every 1000/48 ms"
+    );
+}
+
+#[test]
+fn test_cli_rejects_invalid_fps() {
+    assert!(
+        CliArgs::try_parse_from(["virtual_camera", "--fps", "not-a-number"]).is_err(),
+        "a non-numeric --fps value must be rejected by the CLI"
+    );
+}
+
 // ---------------------------------------------------------------------------
 // Feature 3: Running with, and without, the attached image-viewer
 // ---------------------------------------------------------------------------
@@ -145,5 +181,34 @@ fn test_run_with_image_viewer_roundtrip() {
 
     // Headless rendering must be a successful no-op (keeps tests CI-safe).
     let viewer = ImageViewer::new(true);
-    assert!(!viewer.show_mat(&decoded).is_err());
+    assert!(viewer.show_mat(&decoded).is_ok());
+}
+
+#[test]
+fn test_viewer_survives_undecodable_message() {
+    // The viewer's run loop logs and continues when a message cannot be
+    // decoded (e.g. an unsupported encoding); it must not panic.
+    let bad = virtual_camera::SensorImage {
+        header: virtual_camera::Header {
+            stamp: virtual_camera::Time { sec: 0, nanosec: 0 },
+            frame_id: "world".to_string(),
+        },
+        height: 0,
+        width: 0,
+        encoding: "not_a_real_encoding".to_string(),
+        is_bigendian: 0,
+        step: 0,
+        data: Vec::new(),
+    };
+    assert!(
+        ImageViewer::decode_image(&bad).is_err(),
+        "unsupported encodings must be reported as an error, not panic"
+    );
+
+    // ...and the headless viewer still renders successfully afterwards.
+    let viewer = ImageViewer::new(true);
+    let frame = load_a_frame();
+    let ok_msg = mat_to_sensor_msgs_image(&frame, "world").expect("frame -> message");
+    let decoded = ImageViewer::decode_image(&ok_msg).expect("valid message should decode");
+    assert!(viewer.show_mat(&decoded).is_ok());
 }

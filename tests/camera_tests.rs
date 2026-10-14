@@ -35,7 +35,7 @@ fn create_isolated_test_dir(test_id: &str, target_filename: &str) -> PathBuf {
     let orig_target = base_data_dir.join(target_filename);
     let test_input = temp_dir.join("input_data");
     let _ = symlink(
-        &orig_target.canonicalize().unwrap_or(orig_target),
+        orig_target.canonicalize().unwrap_or(orig_target),
         &test_input,
     );
 

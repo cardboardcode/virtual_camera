@@ -18,35 +18,11 @@ use clap::Parser;
 use log::info;
 use virtual_camera::camera::VirtualCamera;
 use virtual_camera::viewer::ImageViewer;
-use virtual_camera::{get_data_dir, DEFAULT_FPS};
-
-#[derive(Parser, Debug)]
-#[command(author, version, about = "ROS 2 Virtual Camera node written in Rust", long_about = None)]
-struct Args {
-    /// Publishing frame rate in FPS
-    #[arg(short, long, default_value_t = DEFAULT_FPS)]
-    fps: u32,
-
-    /// Rosbridge WebSocket URL
-    #[arg(long, default_value = "ws://localhost:9090")]
-    ws_url: String,
-
-    /// Attach in-process ImageViewer window
-    #[arg(long, default_value_t = false)]
-    use_image_viewer: bool,
-
-    /// Run viewer in headless mode
-    #[arg(long, default_value_t = false)]
-    headless: bool,
-
-    /// Enable debug logging
-    #[arg(long, default_value_t = false)]
-    debug: bool,
-}
+use virtual_camera::{get_data_dir, CliArgs};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let args = Args::parse();
+    let args = CliArgs::parse();
 
     let log_level = if args.debug {
         log::LevelFilter::Debug

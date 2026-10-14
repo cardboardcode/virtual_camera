@@ -3,20 +3,8 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  industrial_ci:
-    strategy:
-      matrix:
-        env:
-          - {ROS_DISTRO: jazzy, ROS_REPO: testing}
-          - {ROS_DISTRO: jazzy, ROS_REPO: main}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{matrix.env}}
-
-  static_analysis:
-    name: "Static Analysis"
+  quality_checks:
+    name: "Lint, Compile & Test"
     runs-on: ubuntu-latest
     container:
       image: ros:jazzy-perception-noble
@@ -42,6 +30,11 @@ jobs:
           set -euxo pipefail
           apt-get update
           apt-get install -y --no-install-recommends shellcheck yamllint
+
+      - name: Install libclang (OpenCV binding codegen dependency)
+        run: |
+          set -euxo pipefail
+          apt-get install -y --no-install-recommends libclang-dev clang libclang1-18
 
       - name: package.xml lint (ament_xmllint)
         run: |
@@ -87,3 +80,16 @@ jobs:
           set -euxo pipefail
           cd "$GITHUB_WORKSPACE"
           $HOME/.cargo/bin/cargo clippy --all-targets -- -D warnings
+
+      - name: Cargo test (unit + integration tests)
+        run: |
+          set -euxo pipefail
+          set +u
+          source /opt/ros/$ROS_DISTRO/setup.bash
+          set -u
+          export PKG_CONFIG_PATH="/opt/ros/$ROS_DISTRO/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+          export CARGO_HOME="$HOME/.cargo"
+          export RUSTUP_HOME="$HOME/.rustup"
+          unset DISPLAY
+          cd "$GITHUB_WORKSPACE"
+          $HOME/.cargo/bin/cargo test --all-targets
