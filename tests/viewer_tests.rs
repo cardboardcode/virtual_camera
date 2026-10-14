@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::sync::atomic::Ordering;
 use opencv::core::Mat;
+use std::sync::atomic::Ordering;
 use virtual_camera::viewer::ImageViewer;
 
 #[test]

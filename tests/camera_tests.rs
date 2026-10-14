@@ -23,7 +23,8 @@ use virtual_camera::{advance_cursor, get_data_dir, mat_to_sensor_msgs_image, Med
 
 fn create_isolated_test_dir(test_id: &str, target_filename: &str) -> PathBuf {
     let base_data_dir = get_data_dir();
-    let temp_dir = std::env::temp_dir().join(format!("vcam_test_{}_{}", test_id, std::process::id()));
+    let temp_dir =
+        std::env::temp_dir().join(format!("vcam_test_{}_{}", test_id, std::process::id()));
     let _ = fs::remove_dir_all(&temp_dir);
     fs::create_dir_all(&temp_dir).expect("Failed to create temp dir");
 
@@ -33,7 +34,10 @@ fn create_isolated_test_dir(test_id: &str, target_filename: &str) -> PathBuf {
 
     let orig_target = base_data_dir.join(target_filename);
     let test_input = temp_dir.join("input_data");
-    let _ = symlink(&orig_target.canonicalize().unwrap_or(orig_target), &test_input);
+    let _ = symlink(
+        &orig_target.canonicalize().unwrap_or(orig_target),
+        &test_input,
+    );
 
     temp_dir
 }
@@ -47,7 +51,8 @@ fn test_image_input_data() {
     assert!(!frame.empty(), "Frame should not be empty");
     assert!(frame.rows() > 0 && frame.cols() > 0);
 
-    let msg = mat_to_sensor_msgs_image(&frame, "world").expect("Failed to convert Mat to Image msg");
+    let msg =
+        mat_to_sensor_msgs_image(&frame, "world").expect("Failed to convert Mat to Image msg");
     assert_eq!(msg.header.frame_id, "world");
     assert_eq!(msg.encoding, "bgr8");
     assert_eq!(msg.height, frame.rows() as u32);
@@ -87,8 +92,11 @@ fn test_fallback_when_symlink_broken() {
     let test_input = temp_dir.join("input_data");
     let _ = symlink(&nonexistent, &test_input);
 
-    let mut media = MediaSource::new(&temp_dir).expect("MediaSource should fall back to default image");
-    let frame = media.get_frame().expect("Should retrieve frame from fallback image");
+    let mut media =
+        MediaSource::new(&temp_dir).expect("MediaSource should fall back to default image");
+    let frame = media
+        .get_frame()
+        .expect("Should retrieve frame from fallback image");
     assert!(!frame.empty(), "Fallback frame should not be empty");
 
     let _ = fs::remove_dir_all(&temp_dir);

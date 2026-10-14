@@ -18,7 +18,7 @@ pub mod viewer;
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 use log::{info, warn};
 use opencv::core::Mat;
@@ -64,15 +64,18 @@ pub fn get_data_dir() -> PathBuf {
     manifest_data
 }
 
+/// Compute the inter-frame delay for a given frame rate.
+///
+/// A rate of `0` is clamped to `1` so the publishing loop never divides by zero
+/// and remains responsive (equivalent to "as fast as the source can deliver").
+pub fn frame_interval(fps: u32) -> Duration {
+    Duration::from_millis(1000 / fps.max(1) as u64)
+}
+
 /// Abstract media source streaming either looped video or static image.
 pub enum MediaSource {
-    Video {
-        cap: VideoCapture,
-        path: PathBuf,
-    },
-    Image {
-        img: Mat,
-    },
+    Video { cap: VideoCapture, path: PathBuf },
+    Image { img: Mat },
 }
 
 impl MediaSource {
@@ -99,7 +102,9 @@ impl MediaSource {
 
         if input_path.exists() {
             if is_image_ext {
-                if let Ok(img) = imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR) {
+                if let Ok(img) =
+                    imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR)
+                {
                     if !img.empty() {
                         info!("Successfully loaded static image from {:?}", input_path);
                         return Ok(MediaSource::Image { img });
@@ -127,7 +132,9 @@ impl MediaSource {
             warn!("Error opening video file. Opening as image instead.");
 
             // Attempt 2: Try reading as static image
-            if let Ok(img) = imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR) {
+            if let Ok(img) =
+                imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR)
+            {
                 if !img.empty() {
                     info!("Successfully loaded static image from {:?}", input_path);
                     return Ok(MediaSource::Image { img });
@@ -152,7 +159,10 @@ impl MediaSource {
             .into());
         }
 
-        info!("Successfully loaded fallback image from {:?}", default_image_path);
+        info!(
+            "Successfully loaded fallback image from {:?}",
+            default_image_path
+        );
         Ok(MediaSource::Image { img: default_img })
     }
 
@@ -165,7 +175,8 @@ impl MediaSource {
 
                 if !success || frame.empty() {
                     // Loop back to beginning
-                    let _ = cap.open_file(&path.to_string_lossy(), VideoCaptureAPIs::CAP_ANY as i32);
+                    let _ =
+                        cap.open_file(&path.to_string_lossy(), VideoCaptureAPIs::CAP_ANY as i32);
                     let retry_success = cap.read(&mut frame).unwrap_or(false);
                     if !retry_success || frame.empty() {
                         return Err("Failed to reload video frame after reaching EOF".into());

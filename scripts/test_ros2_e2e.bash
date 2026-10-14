@@ -33,11 +33,13 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Waiting for rosbridge server on port 9090..."
-for i in {1..30}; do
+attempts=0
+while [ "$attempts" -lt 30 ]; do
     if (echo > /dev/tcp/127.0.0.1/9090) >/dev/null 2>&1; then
         echo "rosbridge server is listening on port 9090."
         break
     fi
+    attempts=$(( attempts + 1 ))
     sleep 0.5
 done
 
@@ -73,7 +75,7 @@ echo "=== [4/4] Verifying message reception via ros2 topic echo ==="
 TIMEOUT_SEC=10
 if timeout "$TIMEOUT_SEC" ros2 topic echo "$TOPIC" --once > /tmp/echo.log 2>&1; then
     echo "Successfully received Image message from $TOPIC!"
-    cat /tmp/echo.log | head -n 15
+    head -n 15 /tmp/echo.log
 else
     echo "ERROR: Timed out waiting for message on $TOPIC."
     cat /tmp/vcam.log

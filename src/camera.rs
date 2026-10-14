@@ -15,14 +15,14 @@
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Arc;
-use std::time::Duration;
 
 use log::{debug, error, info};
 use opencv::core::Mat;
 use roslibrust::rosbridge::{ClientHandle, Publisher};
 
 use crate::{
-    advance_cursor, mat_to_sensor_msgs_image, MediaSource, SensorImage, TOPIC_IMAGE_RAW,
+    advance_cursor, frame_interval, mat_to_sensor_msgs_image, MediaSource, SensorImage,
+    TOPIC_IMAGE_RAW,
 };
 
 pub struct VirtualCamera {
@@ -68,7 +68,11 @@ impl VirtualCamera {
     /// Dynamically update publishing frame rate.
     pub fn set_fps(&self, new_fps: u32) {
         if new_fps > 0 {
-            info!("Updating FPS from {} to {}", self.fps.load(Ordering::Relaxed), new_fps);
+            info!(
+                "Updating FPS from {} to {}",
+                self.fps.load(Ordering::Relaxed),
+                new_fps
+            );
             self.fps.store(new_fps, Ordering::Relaxed);
         }
     }
@@ -87,8 +91,7 @@ impl VirtualCamera {
         );
 
         while self.running.load(Ordering::Relaxed) {
-            let current_fps = self.fps.load(Ordering::Relaxed).max(1);
-            let frame_duration = Duration::from_millis(1000 / current_fps as u64);
+            let frame_duration = frame_interval(self.fps.load(Ordering::Relaxed));
 
             let frame = match self.media_source.get_frame() {
                 Ok(f) => f,

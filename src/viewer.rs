@@ -70,7 +70,9 @@ impl ImageViewer {
     }
 
     /// Decode ROS 2 SensorImage into OpenCV cv::Mat.
-    pub fn decode_image(msg: &SensorImage) -> Result<Mat, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn decode_image(
+        msg: &SensorImage,
+    ) -> Result<Mat, Box<dyn std::error::Error + Send + Sync>> {
         let channels = Self::encoding_to_channels(&msg.encoding)
             .map_err(|e| -> Box<dyn std::error::Error + Send + Sync> { e.into() })?;
 
@@ -92,7 +94,10 @@ impl ImageViewer {
         &mut self,
         ws_url: &str,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        info!("ImageViewer connecting to rosbridge server at {}...", ws_url);
+        info!(
+            "ImageViewer connecting to rosbridge server at {}...",
+            ws_url
+        );
         let client = ClientHandle::new(ws_url).await?;
         info!("Subscribing to topic: {}", TOPIC_IMAGE_RAW);
 

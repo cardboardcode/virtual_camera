@@ -13,7 +13,12 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import (
+    DeclareLaunchArgument,
+    ExecuteProcess,
+    IncludeLaunchDescription,
+    OpaqueFunction,
+)
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
@@ -51,11 +56,20 @@ def generate_launch_description():
     )
 
     def launch_setup(context, *args, **kwargs):
-        use_image_viewer = LaunchConfiguration('use_image_viewer').perform(context).lower() == 'true'
-        use_debug = LaunchConfiguration('use_debug').perform(context).lower() == 'true'
+        use_image_viewer = (
+            LaunchConfiguration('use_image_viewer').perform(context).lower()
+            == 'true'
+        )
+        use_debug = (
+            LaunchConfiguration('use_debug').perform(context).lower()
+            == 'true'
+        )
         fps = LaunchConfiguration('fps').perform(context)
         ws_url = LaunchConfiguration('ws_url').perform(context)
-        start_rosbridge = LaunchConfiguration('start_rosbridge').perform(context).lower() == 'true'
+        start_rosbridge = (
+            LaunchConfiguration('start_rosbridge').perform(context).lower()
+            == 'true'
+        )
 
         actions = []
 
