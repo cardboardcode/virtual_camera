@@ -9,6 +9,10 @@ lcov/*
 *.mkv
 *.mp4
 
+# Rust build artifacts
+target/
+**/*.rs.bk
+
 # Ignore specific file
 data/input_data
 AMENT_IGNORE
