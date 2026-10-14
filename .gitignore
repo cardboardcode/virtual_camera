@@ -10,6 +10,7 @@ lcov/*
 *.mp4
 
 # Rust build artifacts
+Cargo.lock
 target/
 **/*.rs.bk
 

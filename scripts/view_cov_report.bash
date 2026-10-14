@@ -1,1 +1,0 @@
-firefox lcov/index.html
