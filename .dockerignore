@@ -1,0 +1,7 @@
+build/
+target/
+codecov.yml
+CONTRIBUTING.md
+LICENSE
+README.md
+Dockerfile

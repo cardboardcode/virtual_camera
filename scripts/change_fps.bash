@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 
 echo "Please input the FPS integer (1-200)"
-read input
+read -r input
 
-ros2 param set /virtual_camera FPS $input
+ros2 param set /virtual_camera FPS "$input"

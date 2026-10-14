@@ -1,24 +1,61 @@
-FROM ros:humble-ros-base-jammy
+ARG ROS_DISTRO=jazzy
+FROM ros:$ROS_DISTRO-perception-noble
+ENV DEBIAN_FRONTEND=noninteractive
 
-MAINTAINER Bey Hao Yun <beyhy94@gmail.com>
-
-# Add user
-RUN adduser --quiet --disabled-password guiuser
-
-# Install OpenCV
-RUN mv /etc/apt/trusted.gpg /etc/apt/trusted.gpg.d/ && \
-    apt-get update && \
-    apt-get install -y libopencv-dev && \
-    apt-get install -y ros-humble-cv-bridge && \
+# Install ROS 2 packages and build dependencies
+RUN apt-get update && apt-get install -y \
+    ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
+    ros-$ROS_DISTRO-rosbridge-server \
+    curl \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    libclang-dev \
+    clang \
+    xvfb \
+    xauth \
+    xxd \
+    x11-xserver-utils && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/guiuser/
+# Install Rust toolchain
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal \
+    && chmod -R a+w /usr/local/cargo
 
-# Get ROS2 package image_tools available for sourcing.
-USER guiuser
-RUN git clone https://github.com/ros2/demos.git \
-    --branch humble \
-    --single-branch \
-    --depth 1
+WORKDIR /virtual_camera_ws/src/virtual_camera
+COPY . .
 
-WORKDIR /
+# Build virtual_camera Rust binaries
+RUN . /opt/ros/$ROS_DISTRO/setup.sh \
+    && cargo build --release
+
+# Install binaries into standard system and ROS paths, and register into ROS 2 ament index
+RUN mkdir -p /usr/local/bin \
+    && cp target/release/virtual_camera /usr/local/bin/ \
+    && cp target/release/image_viewer /usr/local/bin/ \
+    && mkdir -p /opt/ros/$ROS_DISTRO/lib/virtual_camera \
+    && cp target/release/virtual_camera /opt/ros/$ROS_DISTRO/lib/virtual_camera/ \
+    && cp target/release/image_viewer /opt/ros/$ROS_DISTRO/lib/virtual_camera/ \
+    && mkdir -p /opt/ros/$ROS_DISTRO/share/virtual_camera/launch \
+    && cp launch/showimageraw.launch.py /opt/ros/$ROS_DISTRO/share/virtual_camera/launch/ \
+    && cp package.xml /opt/ros/$ROS_DISTRO/share/virtual_camera/ \
+    && mkdir -p /opt/ros/$ROS_DISTRO/share/ament_index/resource_index/packages \
+    && touch /opt/ros/$ROS_DISTRO/share/ament_index/resource_index/packages/virtual_camera \
+    && mkdir -p /virtual_camera_ws/install/virtual_camera/lib/virtual_camera \
+    && cp target/release/virtual_camera /virtual_camera_ws/install/virtual_camera/lib/virtual_camera/ \
+    && cp target/release/image_viewer /virtual_camera_ws/install/virtual_camera/lib/virtual_camera/ \
+    && mkdir -p /virtual_camera_ws/install/virtual_camera/share/virtual_camera/launch \
+    && cp launch/showimageraw.launch.py /virtual_camera_ws/install/virtual_camera/share/virtual_camera/launch/ \
+    && cp package.xml /virtual_camera_ws/install/virtual_camera/share/virtual_camera/ \
+    && mkdir -p /virtual_camera_ws/install/virtual_camera/share/ament_index/resource_index/packages \
+    && touch /virtual_camera_ws/install/virtual_camera/share/ament_index/resource_index/packages/virtual_camera
+
+RUN echo '#!/bin/bash\n\
+set -e\n\
+source /opt/ros/'"$ROS_DISTRO"'/setup.bash\n\
+exec "$@"' > /ros_entrypoint.sh && chmod +x /ros_entrypoint.sh
+
+ENTRYPOINT ["/ros_entrypoint.sh"]

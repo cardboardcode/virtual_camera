@@ -1,0 +1,95 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  quality_checks:
+    name: "Lint, Compile & Test"
+    runs-on: ubuntu-latest
+    container:
+      image: ros:jazzy-perception-noble
+    defaults:
+      run:
+        shell: bash
+    env:
+      ROS_DISTRO: jazzy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE"
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+            --default-toolchain stable --profile minimal
+          $HOME/.cargo/bin/rustup component add clippy rustfmt
+
+      - name: Install linting tools
+        run: |
+          set -euxo pipefail
+          apt-get update
+          apt-get install -y --no-install-recommends shellcheck yamllint
+
+      - name: Install libclang (OpenCV binding codegen dependency)
+        run: |
+          set -euxo pipefail
+          apt-get install -y --no-install-recommends libclang-dev clang libclang1-18
+
+      - name: package.xml lint (ament_xmllint)
+        run: |
+          set -euxo pipefail
+          set +u
+          . /opt/ros/$ROS_DISTRO/setup.bash
+          set -u
+          cd "$GITHUB_WORKSPACE"
+          ament_xmllint
+
+      - name: launch file lint (ament_lint)
+        run: |
+          set -euxo pipefail
+          set +u
+          . /opt/ros/$ROS_DISTRO/setup.bash
+          set -u
+          cd "$GITHUB_WORKSPACE"
+          ament_flake8 launch && ament_pep257 launch
+
+      - name: bash script checks (shellcheck)
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE"
+          while IFS= read -r -d '' script; do
+            shellcheck -x "$script"
+          done < <(find scripts -name '*.bash' -print0)
+
+      - name: YAML checks (yamllint)
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE"
+          yamllint -d "{extends: default, rules: {line-length: disable}}" \
+            .github/workflows package.xml
+
+      - name: Cargo fmt check
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE"
+          $HOME/.cargo/bin/cargo fmt --check
+
+      - name: Cargo clippy
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE"
+          $HOME/.cargo/bin/cargo clippy --all-targets -- -D warnings
+
+      - name: Cargo test (unit + integration tests)
+        run: |
+          set -euxo pipefail
+          set +u
+          source /opt/ros/$ROS_DISTRO/setup.bash
+          set -u
+          export PKG_CONFIG_PATH="/opt/ros/$ROS_DISTRO/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+          export CARGO_HOME="$HOME/.cargo"
+          export RUSTUP_HOME="$HOME/.rustup"
+          unset DISPLAY
+          cd "$GITHUB_WORKSPACE"
+          $HOME/.cargo/bin/cargo test --all-targets

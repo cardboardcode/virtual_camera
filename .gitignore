@@ -2,8 +2,17 @@
 build/*
 install/*
 log/*
+.vscode/*
+lcov/*
 *.png
 *.jpeg
+*.mkv
+*.mp4
+
+# Rust build artifacts
+Cargo.lock
+target/
+**/*.rs.bk
 
 # Ignore specific file
 data/input_data
