@@ -1,5 +1,5 @@
-[![build](https://github.com/cardboardcode/virtual_camera/actions/workflows/ci.yaml/badge.svg)](https://github.com/cardboardcode/virtual_camera/actions/workflows/ci.yaml)
-![Rust](https://img.shields.io/badge/Rust-2026-DEA584?style=for-the-badge&logo=rust&logoColor=white)
+<a href="https://github.com/cardboardcode/virtual_camera/actions/workflows/ci.yaml"><img src="https://github.com/cardboardcode/virtual_camera/actions/workflows/ci.yaml/badge.svg" alt="build" height="28" /></a>
+<img src="https://img.shields.io/badge/Rust-2026-DEA584?style=for-the-badge&logo=rust&logoColor=white" alt="Rust" height="28" />
 
 ## **What Is This**?
 
