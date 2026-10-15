@@ -1,5 +1,5 @@
-ARG ROS_DISTRO=jazzy
-FROM ros:$ROS_DISTRO-perception-noble
+ARG ROS_DISTRO=lyrical
+FROM ros:$ROS_DISTRO-perception-resolute
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install ROS 2 packages and build dependencies
@@ -21,7 +21,9 @@ RUN apt-get update && apt-get install -y \
 # Install Rust toolchain
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    PATH=/usr/local/cargo/bin:$PATH
+    PATH=/usr/local/cargo/bin:$PATH \
+    CPLUS_INCLUDE_PATH="/usr/include/c++/15:/usr/include/x86_64-linux-gnu/c++/15" \
+    OPENCV_CLANG_ARGS="--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/15"
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal \
     && chmod -R a+w /usr/local/cargo
 

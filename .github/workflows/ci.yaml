@@ -7,12 +7,14 @@ jobs:
     name: "Lint, Compile & Test"
     runs-on: ubuntu-latest
     container:
-      image: ros:jazzy-perception-noble
+      image: ros:lyrical-perception-resolute
     defaults:
       run:
         shell: bash
     env:
-      ROS_DISTRO: jazzy
+      ROS_DISTRO: lyrical
+      CPLUS_INCLUDE_PATH: "/usr/include/c++/15:/usr/include/x86_64-linux-gnu/c++/15"
+      OPENCV_CLANG_ARGS: "--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/15"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,7 +36,7 @@ jobs:
       - name: Install libclang (OpenCV binding codegen dependency)
         run: |
           set -euxo pipefail
-          apt-get install -y --no-install-recommends libclang-dev clang libclang1-18
+          apt-get install -y --no-install-recommends libclang-dev clang
 
       - name: package.xml lint (ament_xmllint)
         run: |

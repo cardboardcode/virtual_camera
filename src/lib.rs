@@ -31,10 +31,10 @@ use opencv::videoio::{self, VideoCapture, VideoCaptureAPIs};
 
 // Generate ROS 2 message definitions for sensor_msgs and std_msgs at compile time
 roslibrust_codegen_macro::generate_ros_types!(
-    "/opt/ros/jazzy/share/std_msgs",
-    "/opt/ros/jazzy/share/builtin_interfaces",
-    "/opt/ros/jazzy/share/geometry_msgs",
-    "/opt/ros/jazzy/share/sensor_msgs"
+    "/opt/ros/lyrical/share/std_msgs",
+    "/opt/ros/lyrical/share/builtin_interfaces",
+    "/opt/ros/lyrical/share/geometry_msgs",
+    "/opt/ros/lyrical/share/sensor_msgs"
 );
 
 pub use builtin_interfaces::Time;
