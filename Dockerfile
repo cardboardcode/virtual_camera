@@ -1,6 +1,3 @@
-# Target ROS 2 distro. Plain `ros:<distro>-perception` tag tracks the current
-# Ubuntu codename for that distro (e.g. jazzy -> noble, rolling -> resolute),
-# so a single knob covers Jazzy and Rolling.
 ARG ROS_DISTRO=rolling
 FROM ros:$ROS_DISTRO-perception
 ENV DEBIAN_FRONTEND=noninteractive
@@ -34,22 +31,22 @@ COPY . .
 # Build virtual_camera Rust binaries.
 #
 # The `opencv` crate's binding generator (opencv-binding-generator) drives
-# libclang directly, and its C include search paths are taken from
-# `clang_sys::support::Clang` rather than the real g++ search path. On
-# Rolling (resolute / GCC-15) clang-21's built-in paths point at a GCC-16
-# location that does not exist, so it fails to find C++ stdlib headers
-# (e.g. `bits/c++config.h`) and C headers (`stdlib.h`). The generator honours
-# the `OPENCV_CLANG_ARGS` env var (generator.rs:435) for extra include dirs, so
-# we feed it the *complete* standard include chain as reported by `g++ -v`
-# (covers both /usr/include/c++/NN and the arch-specific
-# /usr/include/<arch>/c++/NN, plus the C header roots). This is a no-op on
-# Jazzy/noble where clang-18 already resolves those paths.
+# libclang directly, and its C++ include search paths are taken from
+# `clang_sys::support::Clang` (`clang -E -x c++ - -v`). On Rolling (Ubuntu
+# Resolute / GCC 15), `libgcc-16-dev` is also present in the base image (via
+# gfortran-16), causing clang-21 to select GCC 16 even though `libstdc++-16-dev`
+# is not installed; consequently clang omits the C++ stdlib include dirs.
+# Passing those dirs via `OPENCV_CLANG_ARGS` as `-isystem` fails because
+# `opencv-binding-generator` appends `OPENCV_CLANG_ARGS` *after* `-isystem/usr/include`,
+# breaking `#include_next <stdlib.h>` inside `<cstdlib>`. Setting
+# `CPLUS_INCLUDE_PATH` to the C++ stdlib dirs reported by `g++ -v` causes clang
+# to prepend them as `-cxx-isystem` *before* `/usr/include`.
 RUN . /opt/ros/$ROS_DISTRO/setup.sh \
-    && ISYSTEMS=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
-         | awk '/#include <...> search starts here:/{f=1;next} /^ *[^ ]+#include/{f=0} f && /^ *\//{print}') \
-    && OPENCV_CLANG_ARGS=$(printf '%s\n' "$ISYSTEMS" | sed -e 's/^[[:space:]]*//' -e 's|^|-isystem|' | tr '\n' ' ') \
-    && echo "OPENCV_CLANG_ARGS=${OPENCV_CLANG_ARGS}" \
-    && export OPENCV_CLANG_ARGS \
+    && CPLUS_INCLUDE_PATH=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
+         | awk '/#include <...> search starts here:/{f=1;next} /End of search list/{f=0} f && /c\+\+/{gsub(/^[ \t]+/, ""); print}' \
+         | paste -sd: -) \
+    && echo "CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH}" \
+    && export CPLUS_INCLUDE_PATH \
     && cargo build --release
 
 # Install binaries into standard system and ROS paths, and register into ROS 2 ament index
@@ -73,15 +70,14 @@ RUN mkdir -p /usr/local/bin \
     && mkdir -p /virtual_camera_ws/install/virtual_camera/share/ament_index/resource_index/packages \
     && touch /virtual_camera_ws/install/virtual_camera/share/ament_index/resource_index/packages/virtual_camera
 
-# Entrypoint: source the installed ROS distro (image is built for exactly one).
+# Entrypoint: source ROS 2 Rolling and configure CPLUS_INCLUDE_PATH for any in-container cargo builds/tests.
 RUN printf '%s\n' \
     '#!/bin/bash' \
     'set -e' \
-    'if [ -z "${ROS_DISTRO:-}" ]; then' \
-    '    for d in rolling jazzy; do [ -d "/opt/ros/$d" ] && export ROS_DISTRO=$d && break; done' \
-    '    [ -n "${ROS_DISTRO:-}" ] || { echo "No ROS distro found in /opt/ros" >&2; exit 1; }' \
+    'if [ -z "${CPLUS_INCLUDE_PATH:-}" ] && command -v g++ >/dev/null 2>&1; then' \
+    '    export CPLUS_INCLUDE_PATH=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 | awk '\''/#include <...> search starts here:/{f=1;next} /End of search list/{f=0} f && /c\+\+/{gsub(/^[ \t]+/, ""); print}'\'' | paste -sd: -)' \
     'fi' \
-    '. /opt/ros/$ROS_DISTRO/setup.bash' \
+    'source /opt/ros/'"$ROS_DISTRO"'/setup.bash' \
     'exec "$@"' > /ros_entrypoint.sh && chmod +x /ros_entrypoint.sh
 
 ENTRYPOINT ["/ros_entrypoint.sh"]

@@ -4,24 +4,15 @@ on: [push, pull_request]
 
 jobs:
   quality_checks:
-    name: "Lint, Compile & Test [${{ matrix.ros_distro }}]"
+    name: "Lint, Compile & Test"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # Both distros share one source tree; the `build.rs` codegen selects the
-        # active distro at build time. Plain `ros:<distro>-perception` tag tracks
-        # the current Ubuntu codename for that distro.
-        ros_distro:
-          - jazzy
-          - rolling
     container:
-      image: ros:${{ matrix.ros_distro }}-perception
+      image: ros:rolling-perception
     defaults:
       run:
         shell: bash
     env:
-      ROS_DISTRO: ${{ matrix.ros_distro }}
+      ROS_DISTRO: rolling
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -92,14 +83,13 @@ jobs:
           set -euxo pipefail
           cd "$GITHUB_WORKSPACE"
           # OpenCV binding generator needs the C++ stdlib include dirs spelled out
-          # on newer clang (resolute/clang-21). Extract the full search chain from
-          # `g++ -v` (generic + arch-specific C++ dirs and C header roots) and pass
-          # each dir as a single -isystem token — see Dockerfile for details.
-          export OPENCV_CLANG_ARGS=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
-            | awk '/#include <...> search starts here:/{f=1;next} /^ *[^ ]+#include/{f=0} f && /^ *\//{print}' \
-            | sed -e 's/^[[:space:]]*//' -e 's|^|-isystem|' \
-            | tr '\n' ' ')
-          echo "OPENCV_CLANG_ARGS=${OPENCV_CLANG_ARGS}"
+          # on newer clang (resolute/clang-21). Extract the C++ stdlib search chain
+          # from `g++ -v` into CPLUS_INCLUDE_PATH so clang prepends them before
+          # /usr/include — see Dockerfile for details.
+          export CPLUS_INCLUDE_PATH=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
+            | awk '/#include <...> search starts here:/{f=1;next} /End of search list/{f=0} f && /c\+\+/{gsub(/^[ \t]+/, ""); print}' \
+            | paste -sd: -)
+          echo "CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH}"
           $HOME/.cargo/bin/cargo clippy --all-targets -- -D warnings
 
       - name: Cargo test (unit + integration tests)
@@ -111,11 +101,10 @@ jobs:
           export PKG_CONFIG_PATH="/opt/ros/$ROS_DISTRO/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
           export CARGO_HOME="$HOME/.cargo"
           export RUSTUP_HOME="$HOME/.rustup"
-          # Full include chain from g++ -v (see Dockerfile / clippy step).
-          export OPENCV_CLANG_ARGS=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
-            | awk '/#include <...> search starts here:/{f=1;next} /^ *[^ ]+#include/{f=0} f && /^ *\//{print}' \
-            | sed -e 's/^[[:space:]]*//' -e 's|^|-isystem|' \
-            | tr '\n' ' ')
+          # C++ stdlib include chain from g++ -v (see Dockerfile / clippy step).
+          export CPLUS_INCLUDE_PATH=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
+            | awk '/#include <...> search starts here:/{f=1;next} /End of search list/{f=0} f && /c\+\+/{gsub(/^[ \t]+/, ""); print}' \
+            | paste -sd: -)
           unset DISPLAY
           cd "$GITHUB_WORKSPACE"
           $HOME/.cargo/bin/cargo test --all-targets

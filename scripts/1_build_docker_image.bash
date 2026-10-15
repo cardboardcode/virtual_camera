@@ -19,8 +19,4 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$REPO_ROOT"
 
-# Target distro (default rolling; override: ROS_DISTRO=jazzy bash this-script)
-ROS_DISTRO="${ROS_DISTRO:-rolling}"
-IMAGE_TAG="vcam_image:${ROS_DISTRO}"
-echo "Building ${IMAGE_TAG} (ROS ${ROS_DISTRO})"
-docker build --build-arg ROS_DISTRO="$ROS_DISTRO" --tag "$IMAGE_TAG" .
+docker build --tag vcam_image:rolling .

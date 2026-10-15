@@ -25,7 +25,7 @@
 # (e.g. inside the Docker container).
 set -eo pipefail
 
-source "/opt/ros/${ROS_DISTRO:-rolling}/setup.bash"
+source /opt/ros/rolling/setup.bash
 
 read -rp "Please input the FPS integer (1-200): " input
 if ! [[ "$input" =~ ^[0-9]+$ ]] || (( input < 1 || input > 200 )); then

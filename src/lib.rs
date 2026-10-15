@@ -29,12 +29,13 @@ use opencv::imgcodecs;
 use opencv::prelude::*;
 use opencv::videoio::{self, VideoCapture, VideoCaptureAPIs};
 
-// Generate ROS 2 message definitions (sensor_msgs, std_msgs, builtin_interfaces,
-// geometry_msgs) at compile time. The build script (build.rs) probes the active
-// ROS_DISTRO and emits a `generate_ros_types!` invocation with literal message
-// paths into OUT_DIR; we splice it in here. This keeps one source tree that
-// compiles against either Jazzy or Rolling.
-include!(concat!(env!("OUT_DIR"), "/ros_types.rs"));
+// Generate ROS 2 message definitions for sensor_msgs and std_msgs at compile time
+roslibrust_codegen_macro::generate_ros_types!(
+    "/opt/ros/rolling/share/std_msgs",
+    "/opt/ros/rolling/share/builtin_interfaces",
+    "/opt/ros/rolling/share/geometry_msgs",
+    "/opt/ros/rolling/share/sensor_msgs"
+);
 
 pub use builtin_interfaces::Time;
 pub use sensor_msgs::Image as SensorImage;
@@ -105,9 +106,7 @@ impl MediaSource {
 
         if input_path.exists() {
             if is_image_ext {
-                if let Ok(img) =
-                    imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR)
-                {
+                if let Ok(img) = imgcodecs::imread(&input_path, imgcodecs::IMREAD_COLOR) {
                     if !img.empty() {
                         info!("Successfully loaded static image from {:?}", input_path);
                         return Ok(MediaSource::Image { img });
@@ -116,10 +115,9 @@ impl MediaSource {
             }
 
             // Attempt 1: Try reading as video
-            if let Ok(mut cap) = VideoCapture::from_file(
-                &input_path.to_string_lossy(),
-                VideoCaptureAPIs::CAP_ANY as i32,
-            ) {
+            if let Ok(mut cap) =
+                VideoCapture::from_file(&input_path, VideoCaptureAPIs::CAP_ANY as i32)
+            {
                 if cap.is_opened().unwrap_or(false) {
                     let mut test_frame = Mat::default();
                     if cap.read(&mut test_frame).unwrap_or(false) && !test_frame.empty() {
@@ -135,9 +133,7 @@ impl MediaSource {
             warn!("Error opening video file. Opening as image instead.");
 
             // Attempt 2: Try reading as static image
-            if let Ok(img) =
-                imgcodecs::imread(&input_path.to_string_lossy(), imgcodecs::IMREAD_COLOR)
-            {
+            if let Ok(img) = imgcodecs::imread(&input_path, imgcodecs::IMREAD_COLOR) {
                 if !img.empty() {
                     info!("Successfully loaded static image from {:?}", input_path);
                     return Ok(MediaSource::Image { img });
@@ -150,10 +146,7 @@ impl MediaSource {
             "[{:?}] - IMAGE EMPTY or NOT FOUND. Assigning DEFAULT_IMAGE: {:?}",
             input_path, default_image_path
         );
-        let default_img = imgcodecs::imread(
-            &default_image_path.to_string_lossy(),
-            imgcodecs::IMREAD_COLOR,
-        )?;
+        let default_img = imgcodecs::imread(&default_image_path, imgcodecs::IMREAD_COLOR)?;
         if default_img.empty() {
             return Err(format!(
                 "Failed to load default fallback image from {:?}",
@@ -178,8 +171,7 @@ impl MediaSource {
 
                 if !success || frame.empty() {
                     // Loop back to beginning
-                    let _ =
-                        cap.open_file(&path.to_string_lossy(), VideoCaptureAPIs::CAP_ANY as i32);
+                    let _ = cap.open_file(&path, VideoCaptureAPIs::CAP_ANY as i32);
                     let retry_success = cap.read(&mut frame).unwrap_or(false);
                     if !retry_success || frame.empty() {
                         return Err("Failed to reload video frame after reaching EOF".into());

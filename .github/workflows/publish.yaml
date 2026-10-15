@@ -5,14 +5,8 @@ on:
 
 jobs:
   build-and-publish:
-    name: "Build & Publish to GHCR [${{ matrix.ros_distro }}]"
+    name: "Build & Publish to GHCR"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ros_distro:
-          - jazzy
-          - rolling
     permissions:
       packages: write
       contents: read
@@ -35,8 +29,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ matrix.ros_distro }}
-          build-args: |
-            ROS_DISTRO=${{ matrix.ros_distro }}
+          tags: ghcr.io/${{ github.repository }}:rolling
           cache-from: type=gha
           cache-to: type=gha,mode=max
