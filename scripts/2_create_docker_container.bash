@@ -22,6 +22,7 @@ docker run -it --rm \
     --network host \
     --name vcam_test_container \
     -e DISPLAY="$DISPLAY" \
+    -e RCUTILS_COLORIZED_OUTPUT=1 \
     -e RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v "$(pwd)/data":/virtual_camera_ws/src/virtual_camera/data \
