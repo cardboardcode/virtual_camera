@@ -34,7 +34,9 @@ jobs:
       - name: Install libclang (OpenCV binding codegen dependency)
         run: |
           set -euxo pipefail
-          apt-get install -y --no-install-recommends libclang-dev clang libclang1-18
+          apt-get update
+          apt-get install -y --no-install-recommends libclang-dev clang libclang1-14
+          rm -rf /var/lib/apt/lists/*
 
       - name: package.xml lint (ament_xmllint)
         run: |
