@@ -131,8 +131,8 @@ fn test_encoding_conversions() {
 fn test_decode_image() {
     let data_dir = get_data_dir();
     let img_path = data_dir.join("nadezhda_diskant.jpg");
-    let original = imgcodecs::imread(&img_path.to_string_lossy(), imgcodecs::IMREAD_COLOR)
-        .expect("Failed to load test image");
+    let original =
+        imgcodecs::imread(&img_path, imgcodecs::IMREAD_COLOR).expect("Failed to load test image");
 
     let msg = mat_to_sensor_msgs_image(&original, "test_frame").expect("Conversion failed");
     let decoded = ImageViewer::decode_image(&msg).expect("Decoding failed");

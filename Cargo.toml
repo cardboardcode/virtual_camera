@@ -9,7 +9,7 @@ roslibrust = { version = "0.26", features = ["rosbridge", "codegen"] }
 roslibrust_codegen_macro = "0.26"
 tokio = { version = "1.38", features = ["full"] }
 tokio-stream = "0.1"
-opencv = { version = "0.93", default-features = false, features = ["imgcodecs", "videoio", "highgui", "imgproc"] }
+opencv = { version = "0.101", default-features = false, features = ["imgcodecs", "videoio", "highgui", "imgproc"] }
 log = "0.4"
 env_logger = "0.11"
 clap = { version = "4.5", features = ["derive"] }

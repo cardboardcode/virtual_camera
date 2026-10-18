@@ -7,12 +7,12 @@ jobs:
     name: "Lint, Compile & Test"
     runs-on: ubuntu-latest
     container:
-      image: ros:jazzy-perception-noble
+      image: ros:rolling-perception
     defaults:
       run:
         shell: bash
     env:
-      ROS_DISTRO: jazzy
+      ROS_DISTRO: rolling
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -32,9 +32,12 @@ jobs:
           apt-get install -y --no-install-recommends shellcheck yamllint
 
       - name: Install libclang (OpenCV binding codegen dependency)
+        # Unversioned packages track each distro's default clang version
+        # (18 on Jazzy/Noble, 21 on Rolling/Resolute) so one line covers both.
         run: |
           set -euxo pipefail
-          apt-get install -y --no-install-recommends libclang-dev clang libclang1-18
+          apt-get update
+          apt-get install -y --no-install-recommends libclang-dev clang
 
       - name: package.xml lint (ament_xmllint)
         run: |
@@ -79,6 +82,14 @@ jobs:
         run: |
           set -euxo pipefail
           cd "$GITHUB_WORKSPACE"
+          # OpenCV binding generator needs the C++ stdlib include dirs spelled out
+          # on newer clang (resolute/clang-21). Extract the C++ stdlib search chain
+          # from `g++ -v` into CPLUS_INCLUDE_PATH so clang prepends them before
+          # /usr/include — see Dockerfile for details.
+          export CPLUS_INCLUDE_PATH=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
+            | awk '/#include <...> search starts here:/{f=1;next} /End of search list/{f=0} f && /c\+\+/{gsub(/^[ \t]+/, ""); print}' \
+            | paste -sd: -)
+          echo "CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH}"
           $HOME/.cargo/bin/cargo clippy --all-targets -- -D warnings
 
       - name: Cargo test (unit + integration tests)
@@ -90,6 +101,10 @@ jobs:
           export PKG_CONFIG_PATH="/opt/ros/$ROS_DISTRO/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
           export CARGO_HOME="$HOME/.cargo"
           export RUSTUP_HOME="$HOME/.rustup"
+          # C++ stdlib include chain from g++ -v (see Dockerfile / clippy step).
+          export CPLUS_INCLUDE_PATH=$(g++ -x c++ -v -fsyntax-only - </dev/null 2>&1 \
+            | awk '/#include <...> search starts here:/{f=1;next} /End of search list/{f=0} f && /c\+\+/{gsub(/^[ \t]+/, ""); print}' \
+            | paste -sd: -)
           unset DISPLAY
           cd "$GITHUB_WORKSPACE"
           $HOME/.cargo/bin/cargo test --all-targets

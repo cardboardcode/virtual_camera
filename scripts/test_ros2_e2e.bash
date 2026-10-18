@@ -15,7 +15,7 @@
 
 set -e
 
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/rolling/setup.bash
 
 echo "=== [1/4] Starting rosbridge_websocket server ==="
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml > /tmp/rosbridge.log 2>&1 &
