@@ -14,6 +14,9 @@ Cargo.lock
 target/
 **/*.rs.bk
 
+# OMM architecture docs
+.omm/
+
 # Ignore specific file
 data/input_data
 AMENT_IGNORE
