@@ -14,3 +14,7 @@ virtual_camera = { path = ".." }
 [[bin]]
 name = "smoke"
 path = "fuzz_targets/smoke.rs"
+
+[[bin]]
+name = "decode_image"
+path = "fuzz_targets/decode_image.rs"
