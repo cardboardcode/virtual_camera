@@ -16,6 +16,9 @@ target/
 # OMM architecture docs
 .omm/
 
+# Fuzzing plans & docs
+docs/
+
 # Ignore specific file
 data/input_data
 AMENT_IGNORE
