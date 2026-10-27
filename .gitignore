@@ -23,3 +23,6 @@ AMENT_IGNORE
 # Fuzz artifacts
 fuzz/target/
 fuzz/coverage/
+
+# Fuzz working corpus
+fuzz/corpus/
