@@ -35,13 +35,13 @@ jobs:
             vcam_image:rolling \
             bash -c '
               set -euxo pipefail
-              curl --proto \'=https\' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
-              . "$HOME/.cargo/env"
+              # Image bakes RUSTUP_HOME=/usr/local/rustup, CARGO_HOME=/usr/local/cargo (see Dockerfile);
+              # rustup is already installed, so only a nightly toolchain update + cargo-fuzz are needed.
               rustup update nightly
-              $HOME/.cargo/bin/cargo +nightly install cargo-fuzz --locked
+              cargo +nightly install cargo-fuzz --locked
               # Regenerate the seed corpus (not committed) from the JPEG at data/nadezhda_diskant.jpg
-              cd /virt/fuzz && $HOME/.cargo/bin/cargo +nightly run --bin seeds
-              cd /virt/fuzz && PATH=$HOME/.cargo/bin:$PATH $HOME/.cargo/bin/cargo +nightly fuzz run decode_image -- -max_total_time=120
+              cd /virt/fuzz && cargo +nightly run --bin seeds
+              cd /virt/fuzz && cargo +nightly fuzz run decode_image -- -max_total_time=120
             '
 
       - name: Upload fuzz artifacts

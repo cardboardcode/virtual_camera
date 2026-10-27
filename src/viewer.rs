@@ -84,7 +84,7 @@ impl ImageViewer {
         let required = (msg.height as u64)
             .checked_mul(msg.step as u64)
             .filter(|n| *n <= (1u64 << 40))
-            .ok_or_else(|| "image dimensions too large")?;
+            .ok_or("image dimensions too large")?;
         if (msg.data.len() as u64) < required {
             return Err("image data too short".into());
         }
