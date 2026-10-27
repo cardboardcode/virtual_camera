@@ -2,6 +2,7 @@ name: Publish
 
 on:
   push:
+    branches: [rolling, jazzy, humble, lyrical]
 
 jobs:
   build-and-publish:
