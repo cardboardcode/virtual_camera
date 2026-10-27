@@ -22,6 +22,10 @@
 //! encoding_index selects from the target's ENCODINGS array
 //! (0="mono8", 1="bgr8", 2="rgb8", 3="mono16", 4="rgba8", 5="bgra8",
 //!  6="32FC1", 7="junk_encoding").
+//!
+//! The generated files are build artifacts (see .gitignore); do not commit
+//! them. Every consumer (local runs, `scripts/*`, CI in `.github/workflows/
+//! fuzz.yaml`) must invoke `cargo run --bin seeds` before `cargo fuzz run`.
 
 use std::fs;
 use std::path::PathBuf;
@@ -84,5 +88,46 @@ fn main() -> ExitCode {
         println!("wrote {} ({} bytes)", path.display(), bytes.len());
     }
 
+    // Guard: every committed-era seed name must exist and carry a header
+    // payload (16-byte header + >= 1 byte of payload), i.e. it must have
+    // been regenerated rather than left as an empty/stale artifact.
+    for (name, expected) in expected_sizes(w, h, s, &data) {
+        let path = dir.join(name);
+        let meta = fs::metadata(&path)
+            .unwrap_or_else(|e| panic!("seed {path:?} missing after generation: {e}"));
+        assert!(
+            meta.len() >= 17,
+            "seed {path:?} has only {} bytes; expected a 16-byte header plus payload — rerun 'cargo run --bin seeds'",
+            meta.len()
+        );
+        if let Some(len) = expected {
+            assert_eq!(
+                meta.len(),
+                len,
+                "seed {path:?} size {} != expected {len} (stale from a prior generation?); rerun 'cargo run --bin seeds'",
+                meta.len()
+            );
+        }
+    }
+
     ExitCode::SUCCESS
+}
+
+/// Expected on-disk sizes of the generated seeds, keyed by filename.
+/// Used by the post-write guard so a stale/incomplete seed corpus fails fast.
+fn expected_sizes(
+    w: u32,
+    h: u32,
+    s: u32,
+    payload: &[u8],
+) -> Vec<(&'static str, Option<usize>)> {
+    vec![
+        ("01_valid_bgr8.bin", Some(16 + payload.len())),
+        ("02_height_max_u32.bin", Some(16 + 16)),
+        ("03_data_truncated.bin", Some(16 + 256)),
+        ("04_step_zero.bin", Some(16 + 16)),
+        ("05_width_zero.bin", Some(16 + 16)),
+        ("06_junk_encoding.bin", Some(16 + 12)),
+    ]
+}
 }

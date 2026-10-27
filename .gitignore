@@ -29,3 +29,6 @@ fuzz/coverage/
 
 # Fuzz working corpus
 fuzz/corpus/
+
+# Fuzz seeds (regenerated at build/CI time via `cargo run --bin seeds`)
+fuzz/seed_corpus/

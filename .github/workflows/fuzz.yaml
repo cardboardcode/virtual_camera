@@ -39,7 +39,9 @@ jobs:
               . "$HOME/.cargo/env"
               rustup update nightly
               $HOME/.cargo/bin/cargo +nightly install cargo-fuzz --locked
-              PATH=$HOME/.cargo/bin:$PATH $HOME/.cargo/bin/cargo +nightly fuzz run decode_image -- -max_total_time=120
+              # Regenerate the seed corpus (not committed) from the JPEG at data/nadezhda_diskant.jpg
+              cd /virt/fuzz && $HOME/.cargo/bin/cargo +nightly run --bin seeds
+              cd /virt/fuzz && PATH=$HOME/.cargo/bin:$PATH $HOME/.cargo/bin/cargo +nightly fuzz run decode_image -- -max_total_time=120
             '
 
       - name: Upload fuzz artifacts
