@@ -1,0 +1,53 @@
+name: Fuzz
+
+on:
+  push:
+    branches: [main, rolling]
+  pull_request:
+
+jobs:
+  fuzz:
+    name: "Fuzz decode_image (cargo-fuzz / libFuzzer)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        # The root crate's roslibrust codegen macro requires /opt/ros/rolling
+        # at build time, so the fuzz target is built inside the ROS image.
+        run: |
+          set -euxo pipefail
+          docker build -t vcam_image:rolling .
+
+      - name: Run fuzz target in container
+        # The repo is bind-mounted (not a fresh workspace) so libFuzzer's
+        # crash artifacts land in $GITHUB_WORKSPACE/fuzz/artifacts for upload.
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE"
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE":/virt \
+            -w /virt \
+            vcam_image:rolling \
+            bash -c '
+              set -euxo pipefail
+              curl --proto \'=https\' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
+              . "$HOME/.cargo/env"
+              rustup update nightly
+              $HOME/.cargo/bin/cargo +nightly install cargo-fuzz --locked
+              PATH=$HOME/.cargo/bin:$PATH $HOME/.cargo/bin/cargo +nightly fuzz run decode_image -- -max_total_time=120
+            '
+
+      - name: Upload fuzz artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        id: fuzz-artifacts
+        with:
+          name: fuzz-artifacts
+          path: ${{ github.workspace }}/fuzz/artifacts
+          if-no-files-found: warn

@@ -35,3 +35,14 @@ To update the selection later, simply place your new media file in `data/` and r
 ```bash
 bash scripts/2_create_docker_container.bash
 ```
+
+## **Fuzzing** :bug:
+
+The `decode_image` fuzz target guards the untrusted-network boundary: ROS 2 `sensor_msgs/Image` geometry fields (width, height, step, size) arrive untrusted over DDS/rosbridge and are fed into the OpenCV decode path, so malformed values must never crash the node.
+
+- CI runs the fuzzer via `.github/workflows/fuzz.yaml` on every push to `main`/`rolling` and on pull requests, time-boxed to 120 s (`-max_total_time=120`) inside the Docker image.
+- Run it locally (requires nightly + `cargo-fuzz`):
+
+```bash
+cargo +nightly fuzz run decode_image
+```
