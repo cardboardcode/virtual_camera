@@ -76,6 +76,19 @@ impl ImageViewer {
         let channels = Self::encoding_to_channels(&msg.encoding)
             .map_err(|e| -> Box<dyn std::error::Error + Send + Sync> { e.into() })?;
 
+        // Validate geometry before any OpenCV call to avoid i32 truncation,
+        // degenerate strides, and buffer underruns in the unsafe Mat constructors.
+        if msg.step == 0 || msg.width == 0 || msg.height == 0 {
+            return Err("image geometry must be non-zero".into());
+        }
+        let required = (msg.height as u64)
+            .checked_mul(msg.step as u64)
+            .filter(|n| *n <= (1u64 << 40))
+            .ok_or_else(|| "image dimensions too large")?;
+        if (msg.data.len() as u64) < required {
+            return Err("image data too short".into());
+        }
+
         let flat = Mat::new_rows_cols_with_data(msg.height as i32, msg.step as i32, &msg.data)?;
         let reshaped = flat.reshape(channels, msg.height as i32)?;
         let mut owned = reshaped.try_clone()?;

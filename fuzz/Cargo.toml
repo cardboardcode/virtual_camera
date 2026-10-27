@@ -9,7 +9,12 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
+opencv = { version = "0.101", default-features = false, features = ["imgcodecs"] }
 virtual_camera = { path = ".." }
+
+[[bin]]
+name = "seeds"
+path = "seeds.rs"
 
 [[bin]]
 name = "smoke"
