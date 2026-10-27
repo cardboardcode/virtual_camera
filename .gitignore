@@ -19,3 +19,7 @@ target/
 # Ignore specific file
 data/input_data
 AMENT_IGNORE
+
+# Fuzz artifacts
+fuzz/target/
+fuzz/coverage/
